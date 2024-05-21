@@ -1,45 +1,95 @@
-# School App (Spring Boot MVC)
+## School App (Spring Boot MVC)
+# Description
+This project is a School Management Application developed using the Spring Boot MVC framework. It provides functionalities for managing students, teachers, courses, and other aspects related to school administration. The application includes authentication and authorization features, a responsive user interface using Thymeleaf, and is integrated with a MySQL database.
 
-## Description
-This project is a School Management Application developed using Spring Boot MVC framework. It provides functionalities for managing students, teachers, courses, and other aspects related to school administration.
+# Prerequisites
+Java Development Kit (JDK) version 17 or higher
+Maven
+MySQL database
 
-## Prerequisites
-- Java Development Kit (JDK) version 17 or higher
-- Maven
-- MySQL database
+# Installation
+Clone the repository by using the appropriate git command.
+Navigate to the project directory.
+Configure the database by creating a MySQL database named school_app and updating the application.properties file with your database credentials.
+Build the project using Maven.
+Run the application using the Maven Spring Boot plugin.
 
-## Installation
-1. Clone the repository: `git clone https://github.com/your_username/school-app-springboot-mvc.git`
-2. Navigate to the project directory: `cd school-app-springboot-mvc`
-3. Build the project: `mvn clean install`
-4. Run the application: `mvn spring-boot:run`
+# Technologies Used
+Spring Boot
+Spring MVC
+Spring Data JPA
+Thymeleaf
+MySQL
+Spring Security
+TestNG
+Mockito
 
-## Technologies Used
-- Spring Boot
-- Spring MVC
-- Spring Data JPA
-- Thymeleaf
-- MySQL
-- Spring Security
-- TestNG
-- Mockito
+# Project Structure
 
-## Dependencies
-The project's dependencies are managed using Maven. Here are the main dependencies listed in the `pom.xml` file:
-- `spring-boot-starter-data-jpa`
-- `spring-boot-starter-thymeleaf`
-- `spring-boot-starter-validation`
-- `spring-boot-devtools`
-- `mysql-connector-java`
-- `lombok`
-- `spring-boot-starter-test`
-- `spring-boot-starter-web`
-- `spring-boot-starter-security`
-- `spring-security-test`
-- `thymeleaf-extras-springsecurity6`
-- `testng`
-- `mockito-core`
+# Schema
+The database schema includes tables for managing students, teachers, users, classrooms, and courses. The schema is defined using JPA entities.
 
-## License
-This project is licensed under the [MIT License](LICENSE).
+# Service Layer
+The service layer contains business logic and interacts with repositories to fetch and persist data. Key services include:
 
+AdminService
+TeacherService
+StudentService
+UserService
+# Data Transfer Objects (DTOs)
+
+DTOs are used to transfer data between the client and server. Key DTOs include:
+
+RegisterAdminDTO
+RegisterTeacherDTO
+RegisterStudentDTO
+
+# Controllers
+Controllers handle HTTP requests and responses. Key controllers include:
+
+AdminsController
+TeachersController
+StudentsController
+UsersController
+
+# Repositories
+Repositories interact with the database to perform CRUD operations. Key repositories include:
+
+AdminRepository
+TeacherRepository
+StudentRepository
+UserRepository
+
+# Mappers
+Mappers convert between DTOs and entities. The Mapper class includes methods like:
+
+extractAdminFromRegisterAdminDTO
+extractTeacherFromRegisterTeacherDTO
+extractStudentFromRegisterStudentDTO
+extractUserFromRegisterAdminDTO
+
+# Enums
+Enums are used for predefined constants, such as roles within the application.
+
+# Authentication
+Spring Security is used to handle authentication and authorization. Security configurations are defined in the SecurityConfig class.
+
+# Thymeleaf Templates
+Thymeleaf is used for server-side rendering of HTML pages. Templates are located in the templates directory.
+
+# Static Resources
+JavaScript and CSS files are located in the static directory.
+
+# Logging
+Logging is configured using the logback.xml file.
+
+# Testing
+The service layer is tested using TestNG and Mockito. Key test classes include:
+
+AdminServiceImplTest
+TeacherServiceImplTest
+StudentServiceImplTest
+UserServiceImplTest
+License
+
+# This project is licensed under the MIT License.
