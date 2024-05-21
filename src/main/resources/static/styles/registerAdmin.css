@@ -1,0 +1,18 @@
+.form-container {
+    max-width: 600px;
+    margin: auto;
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.form-container h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+.form-container .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    width: 100%;
+    font-size: 1.2rem;
+}

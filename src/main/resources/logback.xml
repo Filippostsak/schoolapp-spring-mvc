@@ -1,0 +1,67 @@
+<configuration>
+    <!--
+        Appender that writes log messages to a file. The 'name' attribute is a unique name for the appender,
+        and the 'class' attribute specifies the appender class to be used.
+    -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <!--
+            Specifies the file where log messages will be written.
+            Update this path to the desired location for your log files.
+        -->
+        <file>/Users/filippostsakiris/Desktop/logger/jpa-rest/loggerSchoolAppRest.txt</file>
+
+        <!--
+            Uncomment the following line to append to the existing file instead of overwriting it.
+            <append>true</append>
+        -->
+
+        <!--
+            Rolling policy to roll the log file based on time. Uncomment to enable.
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>C:\Users\a8ana\IdeaProjects\schoolapp-hibernate-jaxrs-cf22\cf-%d{dd-MM-yyyy}.log</fileNamePattern>
+            </rollingPolicy>
+        -->
+
+        <!--
+            Encoder that specifies the format of the log messages.
+            %d - date
+            %thread - thread name
+            %-5level - log level
+            %logger{36} - logger name truncated to 36 characters
+            %msg - log message
+            %n - new line
+        -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+        Appender that writes log messages to the console.
+        The 'name' attribute is a unique name for the appender,
+        and the 'class' attribute specifies the appender class to be used.
+    -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!--
+            Encoder that specifies the format of the log messages.
+            %d - date
+            %thread - thread name
+            %-5level - log level
+            %logger{36} - logger name truncated to 36 characters
+            %msg - log message
+            %n - new line
+        -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+        Root logger configuration. The 'level' attribute sets the logging level.
+        The 'appender-ref' elements reference the appenders defined above.
+    -->
+    <root level="info">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>
