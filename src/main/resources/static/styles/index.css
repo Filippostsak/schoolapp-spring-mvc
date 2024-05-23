@@ -1,0 +1,83 @@
+/* Reset some default styles */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+}
+
+/* Set the background and font styles for the body */
+body {
+    line-height: 1.6;
+    font-family: Arial, sans-serif;
+    color: #333;
+    background: linear-gradient(to right, black, blue);
+}
+
+.colorful-par,
+.header,
+.feature-card {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.header {
+    padding: 50px 0;
+    text-align: center;
+}
+
+.management-system-img {
+    max-width: 100%;
+    height: auto;
+}
+
+.feature-card {
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.feature-card img {
+    border-radius: 10px;
+}
+
+.feature-card h4 {
+    margin-top: 15px;
+}
+
+.feature-card p {
+    margin-top: 10px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+#section-title {
+    animation: fadeIn 3s infinite;
+}

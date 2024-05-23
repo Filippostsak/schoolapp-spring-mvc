@@ -1,6 +1,6 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
-import gr.aueb.cf.schoolappspringbootmvc.dto.RegisterAdminDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.admin.RegisterAdminDTO;
 import gr.aueb.cf.schoolappspringbootmvc.model.Admin;
 import gr.aueb.cf.schoolappspringbootmvc.service.exceptions.AdminAlreadyExistsException;
 

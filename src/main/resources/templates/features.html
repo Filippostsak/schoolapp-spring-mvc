@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Features</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/styles/footer.css}">
+    <link rel="stylesheet" th:href="@{/styles/navbar.css}">
+    <link rel="stylesheet" th:href="@{/styles/features.css}">
+</head>
+<body>
+<nav th:replace="components/navbar :: navbar"></nav>
+<div class="container mt-5 mb-5">
+    <h1 class="display-4 text-center mb-4">Explore Our Powerful Features</h1>
+    <div class="mt-5 mb-5">
+        <p class="lead text-center">
+            Our School Management Application offers a comprehensive set of tools to manage all aspects of your school's operations. From user management to detailed reporting and analytics, our features are designed to streamline administrative tasks and enhance the learning experience. Explore the sections below to discover everything we offer.
+        </p>
+    </div>
+    <br>
+    <div class="d-flex justify-content-center mb-5">
+        <img style="width:450px" class="img-fluid features-img rounded shadow-lg" th:src="@{../img/features.jpeg}" alt="features-banner">
+    </div>
+    <br>
+
+    <div class="row mt-5 mb-5">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action active" onclick="showSection(event, 'user-management')">User Management</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'course-classroom-management')">Course and Classroom Management</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'communication')">Communication</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'attendance-performance-tracking')">Attendance and Performance Tracking</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'reporting-analytics')">Reporting and Analytics</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'security-features')">Security Features</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'user-interface')">User Interface and Experience</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'integrations')">Integrations</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'notifications-alerts')">Notifications and Alerts</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'administrative-tools')">Administrative Tools</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'documentation-support')">Documentation and Support</a>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div id="user-management" class="content-section active">
+                <h2>User Management</h2>
+                <p>Manage students, teachers, and admins with secure authentication and role-based access control.</p>
+            </div>
+            <div id="course-classroom-management" class="content-section">
+                <h2>Course and Classroom Management</h2>
+                <p>Create and manage courses, assign classrooms, and handle timetables efficiently.</p>
+            </div>
+            <div id="communication" class="content-section">
+                <h2>Communication</h2>
+                <p>Post announcements and send automated email notifications for updates and reminders.</p>
+            </div>
+            <div id="attendance-performance-tracking" class="content-section">
+                <h2>Attendance and Performance Tracking</h2>
+                <p>Track student attendance and manage grades and performance reports.</p>
+            </div>
+            <div id="reporting-analytics" class="content-section">
+                <h2>Reporting and Analytics</h2>
+                <p>Generate custom reports and view dashboard analytics for key statistics and trends.</p>
+            </div>
+            <div id="security-features" class="content-section">
+                <h2>Security Features</h2>
+                <p>Implement role-based access control, data encryption, and audit logs for security and compliance.</p>
+            </div>
+            <div id="user-interface" class="content-section">
+                <h2>User Interface and Experience</h2>
+                <p>Enjoy a responsive design, customizable UI, and dynamic content rendering with Thymeleaf.</p>
+            </div>
+            <div id="integrations" class="content-section">
+                <h2>Integrations</h2>
+                <p>Integrate with third-party services like email, payment gateways, and more.</p>
+            </div>
+            <div id="notifications-alerts" class="content-section">
+                <h2>Notifications and Alerts</h2>
+                <p>Receive real-time alerts and scheduled notifications for important events and deadlines.</p>
+            </div>
+            <div id="administrative-tools" class="content-section">
+                <h2>Administrative Tools</h2>
+                <p>Perform bulk operations, configure system settings, and manage school data efficiently.</p>
+            </div>
+            <div id="documentation-support" class="content-section">
+                <h2>Documentation and Support</h2>
+                <p>Access comprehensive documentation and customer support for troubleshooting and assistance.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="components/footer :: footer"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script th:src="@{../js/features.js}"></script>
+</body>
+</html>

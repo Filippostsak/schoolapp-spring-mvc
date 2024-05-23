@@ -1,6 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
+    // Hide the error alert initially
+    const errorAlert = document.getElementById('errorAlert');
+    if (errorAlert) {
+        errorAlert.style.display = 'none';
+    }
+
     // Select all forms that need validation
     const forms = document.querySelectorAll('.needs-validation');
 
@@ -13,20 +19,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 event.preventDefault();
                 event.stopPropagation();
             } else {
-                // Show success message
-                const successMessage = document.createElement('div');
-                successMessage.className = 'alert alert-success mt-2';
-                successMessage.textContent = 'Successfully logged in. Redirecting...';
-                form.parentNode.insertBefore(successMessage, form);
+                event.preventDefault(); // Prevent default form submission
 
-                // Hide form and redirect after 2 seconds
-                form.style.display = 'none';
+                // Show spinner and hide the submit button
+                const submitButton = form.querySelector('button[type="submit"]');
+                const spinner = submitButton.nextElementSibling;
+
+                submitButton.style.display = 'none';
+                spinner.style.display = 'inline-block';
                 setTimeout(() => {
-                    window.location.href = '/index';
-                }, 2000);
-            }
+                    const username = form.username.value.trim();
+                    const password = form.password.value.trim();
 
-            // Add the was-validated class to the form to show validation feedback
+                    fetch('/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            password: password
+                        }),
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                form.submit(); // Submit the form if validation passes
+                            } else {
+                                // Show the error alert if validation fails
+                                if (errorAlert) {
+                                    errorAlert.textContent = 'Invalid username or password';
+                                    errorAlert.style.display = 'block';
+                                }
+
+                                // Hide spinner and show the submit button again
+                                submitButton.style.display = 'block';
+                                spinner.style.display = 'none';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            // Hide spinner and show the submit button again
+                            submitButton.style.display = 'block';
+                            spinner.style.display = 'none';
+                        });
+                }, 1000);
+            }
             form.classList.add('was-validated');
         }, false);
     });

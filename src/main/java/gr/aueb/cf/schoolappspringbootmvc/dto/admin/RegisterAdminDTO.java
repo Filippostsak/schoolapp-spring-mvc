@@ -1,4 +1,4 @@
-package gr.aueb.cf.schoolappspringbootmvc.dto;
+package gr.aueb.cf.schoolappspringbootmvc.dto.admin;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -13,18 +13,18 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
 /**
- * Data Transfer Object (DTO) for registering a teacher.
- * This class contains fields that are required for registering a teacher,
+ * Data Transfer Object (DTO) for registering an admin.
+ * This class contains fields that are required for registering an admin,
  * along with the necessary validation annotations.
  */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class RegisterTeacherDTO {
+public class RegisterAdminDTO {
 
     /**
-     * The username of the teacher.
+     * The username of the admin.
      * It must be between 3 and 32 characters long and cannot be null.
      */
     @NotNull
@@ -32,7 +32,7 @@ public class RegisterTeacherDTO {
     private String username;
 
     /**
-     * The email address of the teacher.
+     * The email address of the admin.
      * It must be a valid email format and cannot be null.
      */
     @NotNull
@@ -40,7 +40,7 @@ public class RegisterTeacherDTO {
     private String email;
 
     /**
-     * The password of the teacher.
+     * The password of the admin.
      * It must be between 5 and 32 characters long, include at least one uppercase letter,
      * one lowercase letter, one number, and one special character. It cannot be null.
      */
@@ -59,7 +59,7 @@ public class RegisterTeacherDTO {
     private String confirmPassword;
 
     /**
-     * The first name of the teacher.
+     * The first name of the admin.
      * It must be between 3 and 32 characters long and cannot be null.
      */
     @NotNull
@@ -67,7 +67,7 @@ public class RegisterTeacherDTO {
     private String firstname;
 
     /**
-     * The last name of the teacher.
+     * The last name of the admin.
      * It must be between 3 and 32 characters long and cannot be null.
      */
     @NotNull
@@ -75,7 +75,7 @@ public class RegisterTeacherDTO {
     private String lastname;
 
     /**
-     * The birth date of the teacher.
+     * The birth date of the admin.
      * It must be in the format "yyyy-MM-dd" and cannot be null.
      */
     @NotNull
@@ -83,14 +83,14 @@ public class RegisterTeacherDTO {
     private LocalDate birthDate;
 
     /**
-     * The country of the teacher.
+     * The country of the admin.
      * It cannot be null.
      */
     @NotNull
     private String country;
 
     /**
-     * The city of the teacher.
+     * The city of the admin.
      * It cannot be null.
      */
     @NotNull

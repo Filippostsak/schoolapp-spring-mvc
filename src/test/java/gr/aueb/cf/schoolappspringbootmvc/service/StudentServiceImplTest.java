@@ -1,7 +1,6 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
-import gr.aueb.cf.schoolappspringbootmvc.dto.RegisterStudentDTO;
-import gr.aueb.cf.schoolappspringbootmvc.mapper.Mapper;
+import gr.aueb.cf.schoolappspringbootmvc.dto.student.RegisterStudentDTO;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.User;
 import gr.aueb.cf.schoolappspringbootmvc.repository.StudentRepository;

@@ -29,8 +29,11 @@ public class Teacher extends AbstractEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(mappedBy = "teachers")
     private List<Classroom> classrooms = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "extraTeachers")
+    private List<Classroom> extraClassrooms = new ArrayList<>();
 
     /**
      * Constructs a new {@link Teacher} instance with the specified first name and last name.
@@ -60,8 +63,10 @@ public class Teacher extends AbstractEntity {
      * @param classroom the classroom to add
      */
     public void addClassroom(Classroom classroom) {
-        classrooms.add(classroom);
-        classroom.setTeacher(this);
+        if (!classrooms.contains(classroom)) {
+            classrooms.add(classroom);
+            classroom.addTeacher(this);
+        }
     }
 
     /**
@@ -70,8 +75,34 @@ public class Teacher extends AbstractEntity {
      * @param classroom the classroom to remove
      */
     public void removeClassroom(Classroom classroom) {
-        classrooms.remove(classroom);
-        classroom.setTeacher(null);
+        if (classrooms.contains(classroom)) {
+            classrooms.remove(classroom);
+            classroom.removeTeacher(this);
+        }
+    }
+
+    /**
+     * Adds an extra classroom to the list of extra classrooms managed by this teacher.
+     *
+     * @param classroom the extra classroom to add
+     */
+    public void addExtraClassroom(Classroom classroom) {
+        if (!extraClassrooms.contains(classroom)) {
+            extraClassrooms.add(classroom);
+            classroom.addExtraTeacher(this);
+        }
+    }
+
+    /**
+     * Removes an extra classroom from the list of extra classrooms managed by this teacher.
+     *
+     * @param classroom the extra classroom to remove
+     */
+    public void removeExtraClassroom(Classroom classroom) {
+        if (extraClassrooms.contains(classroom)) {
+            extraClassrooms.remove(classroom);
+            classroom.removeExtraTeacher(this);
+        }
     }
 
     /**
@@ -87,6 +118,7 @@ public class Teacher extends AbstractEntity {
                 ", lastname='" + lastname + '\'' +
                 ", user=" + user +
                 ", classrooms=" + classrooms +
+                ", extraClassrooms=" + extraClassrooms +
                 '}';
     }
 }

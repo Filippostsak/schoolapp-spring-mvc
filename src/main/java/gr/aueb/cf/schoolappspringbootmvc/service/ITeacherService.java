@@ -1,22 +1,21 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
-import gr.aueb.cf.schoolappspringbootmvc.dto.RegisterTeacherDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.RegisterTeacherDTO;
+import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
 import gr.aueb.cf.schoolappspringbootmvc.service.exceptions.TeacherAlreadyExistsException;
 
 import java.util.List;
+import java.util.Optional;
 
-/**
- * Service interface for managing teachers.
- */
 public interface ITeacherService {
 
     /**
-     * Registers a new teacher based on the provided data transfer object.
+     * Registers a new teacher.
      *
-     * @param dto the data transfer object containing the information needed to register a teacher.
+     * @param dto the data transfer object containing teacher registration information.
      * @return the registered teacher.
-     * @throws TeacherAlreadyExistsException if a teacher with the same username already exists.
+     * @throws TeacherAlreadyExistsException if a teacher with the specified username already exists.
      */
     Teacher registerTeacher(RegisterTeacherDTO dto) throws TeacherAlreadyExistsException;
 
@@ -24,7 +23,30 @@ public interface ITeacherService {
      * Retrieves all teachers.
      *
      * @return a list of all teachers.
-     * @throws Exception if there is an error retrieving the teachers.
+     * @throws Exception if an error occurs while retrieving the teachers.
      */
     List<Teacher> findAllTeachers() throws Exception;
+
+    /**
+     * Searches for students by their last name.
+     *
+     * @param lastName the last name to search for.
+     * @return a list of students with matching last names.
+     */
+    List<Student> searchStudentsByLastName(String lastName);
+
+    /**
+     * Finds a teacher by their first name.
+     *
+     * @param firstname the first name to search for.
+     * @return the teacher with the matching first name.
+     */
+    Teacher findTeacherByFirstname(String firstname);
+
+    /**
+     * Retrieves the currently authenticated teacher.
+     *
+     * @return an Optional containing the current teacher if found, otherwise empty.
+     */
+    Optional<Teacher> getCurrentAuthenticatedTeacher();
 }

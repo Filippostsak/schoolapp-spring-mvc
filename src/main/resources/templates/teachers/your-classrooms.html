@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Classrooms</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles/teachersYourClassrooms.css">
+  <link rel="stylesheet" href="../../styles/footer.css">
+  <link rel="stylesheet" href="../../styles/navbar.css">
+</head>
+<body>
+<nav th:replace="~{components/navbar :: navbar}"></nav>
+<div class="container mt-5 mb-5">
+  <h4 class="display-5 text-center mb-4">Hey, <span th:text="${firstname}">Teacher</span></h4>
+  <div class="d-flex justify-content-center">
+    <p class="">here you can manage your classrooms!</p>
+  </div>
+
+  <div class="row mt-5 mb-5">
+    <div class="col-md-12 shadow-lg rounded p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Your Classrooms</h2>
+        <div>
+          <input type="text" class="form-control" id="searchInput" placeholder="Search Classrooms..." onkeyup="searchClassrooms()">
+        </div>
+      </div>
+      <div th:if="${classrooms}">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="classroomGrid">
+          <div class="col" th:each="classroom : ${classrooms}">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title" th:text="${classroom.name}">Classroom Name</h4>
+                <p class="card-text" th:text="${classroom.description}">Classroom Description</p>
+                <p class="card-text"><small th:text="${#temporals.format(classroom.createdAt, 'dd/MM/yyyy')}">Created At</small></p>
+                <button class="btn btn-primary btn-sm" onclick="openAddTeacherModal([[${classroom.id}]])">Add Teacher</button>
+                <a th:href="@{/teachers/classroom-details/{id}(id=${classroom.id})}" class="btn btn-secondary btn-sm">View Details</a>
+                <a th:href="@{/teachers/update-classroom/{id}(id=${classroom.id})}" class="btn btn-warning btn-sm">Update</a>
+                <button class="btn btn-danger btn-sm" onclick="deleteClassroom([[${classroom.id}]])">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div th:if="${#lists.isEmpty(classrooms)}" class="alert alert-warning" role="alert">
+        No classrooms found.
+      </div>
+
+      <!-- Pagination Controls -->
+      <div th:if="${totalPages > 1}" class="d-flex justify-content-center align-items-center mt-4">
+        <a class="btn btn-outline-primary me-2" th:href="@{/teachers/your-classrooms(page=${currentPage - 1})}" th:classappend="${currentPage == 1} ? 'disabled'">
+          &laquo; Previous
+        </a>
+        <span class="text-white mx-2">Page <span th:text="${currentPage}"></span> of <span th:text="${totalPages}"></span></span>
+        <a class="btn btn-outline-primary ms-2" th:href="@{/teachers/your-classrooms(page=${currentPage + 1})}" th:classappend="${currentPage == totalPages} ? 'disabled'">
+          Next &raquo;
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Adding Teacher -->
+<div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addTeacherModalLabel">Add Teacher</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="addTeacherForm" th:action="@{/teachers/add-teacher}" method="post">
+        <div class="modal-body">
+          <input type="hidden" id="classroomId" name="classroomId">
+          <div class="mb-3">
+            <label for="teacherUsername" class="form-label">Teacher Username</label>
+            <input type="text" class="form-control" id="teacherUsername" name="teacherUsername" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Add Teacher</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer th:replace="~{components/footer :: footer}"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="../../js/teacherYourClassrooms.js"></script>
+</body>
+</html>

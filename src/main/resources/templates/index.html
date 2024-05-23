@@ -2,59 +2,108 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>homepage</title>
+    <title>Homepage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" th:href="@{/styles/index.css}">
+    <link rel="stylesheet" th:href="@{/styles/emailUs.css}">
+    <link rel="stylesheet" th:href="@{/styles/footer.css}">
+    <link rel="stylesheet" th:href="@{/styles/navbar.css}">
+    <link rel="stylesheet" th:href="@{/styles/pricing.css}">
 </head>
 <body>
 
-<!--add navbar fragment-->
+<!-- Navbar Fragment -->
 <nav th:replace="components/navbar :: navbar"></nav>
 
-<header>
-    <div class="m-3 header text-white rounded shadow-sm">
-        <div class="d-flex justify-content-center mt-5">
-            <h1 class="display-1">School Management System</h1>
-            <p class="colorful-par mt-4 rounded shadow-lg fw-bold text-center p-3 mt-auto mb-auto">The only application you need to manage your school</p>
+<!-- Header Section -->
+<header id="custom-header" class="text-white shadow-lg mt-4 mb-5 rounded p-3" style="background: rgba(255, 255, 255, 0.1); padding: 50px 0; text-align: center; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); overflow: hidden;">
+    <div class="container mt-5 mb-5" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center;">
+        <div style="animation: fadeInRight 2s ease-in-out;">
+            <h1 class="display-1" style="font-size: 3.5rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); animation: fadeInDown 2s ease-in-out;">School Management System</h1>
+            <p class="colorful-par mt-4 rounded shadow-lg fw-bold text-center p-3" style="background: rgba(255, 255, 255, 0.1); color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); animation: fadeInUp 2s ease-in-out;">
+                The only application you need to manage your classrooms!
+                Don't waste time, sign up and unlock impressive features.
+            </p>
+            <div class="mt-4 d-flex justify-content-center gap-3" style="animation: fadeIn 3s ease-in-out;">
+                <a class="btn btn-light btn-lg shadow-lg" th:href="@{register}" style="color: #000; background-color: #007bff; transition: all 0.3s ease; border-radius: 5px;">Get started</a>
+                <a class="btn btn-info btn-lg" th:href="@{'#'}" style="color: white; background-color: #17a2b8; transition: all 0.3s ease; border-radius: 5px;">Learn more...</a>
+            </div>
         </div>
-        <div class="d-flex justify-content-center mt-3 mb-3">
-            <a type="button" class="p-3 btn btn-light shadow-lg" th:href="@{register}">Get started</a>
-        </div>
-        <div class="d-flex justify-content-center fs-2 text-center mt-5">
-            What are school management systems? How does it contribute to the improvement of the school?
-        </div>
-        <div class="d-flex justify-content-center mt-5">
-            <a class="btn btn-info" th:ref="">Learn more..</a>
+        <img class="img-fluid rounded shadow-lg" th:src="@{../img/management.png}" alt="Management System" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); animation: fadeInLeft 2s ease-in-out;">
+    </div>
+    <div class="container mt-5 mb-5" style="animation: fadeInUp 3s ease-in-out;">
+        <h2 class="text-center" style="font-size: 2.5rem; color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); margin-bottom: 30px;">
+            Why Use a School Management System?
+        </h2>
+        <div class="row mt-5 mb-5">
+            <div class="col-md-6 mb-4" style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); color: white;">
+                <p>
+                    In today's fast-paced educational environment, a school management system is essential for efficiently managing various administrative tasks. It helps streamline processes, enhances communication, and provides real-time access to important information. This leads to improved productivity and a more organized school operation.
+                </p>
+            </div>
+            <div class="col-md-6 mb-4" style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); color: white;">
+                <p>
+                    With a school management system, you can easily track student progress, manage schedules, and communicate effectively with teachers, students, and parents. This not only saves time but also ensures that everyone is on the same page, contributing to a better educational experience for all.
+                </p>
+            </div>
         </div>
     </div>
 </header>
-<main>
-<!--    photo of the management system-->
-    <div class="m-2">
-        <div class="m-2 d-flex justify-content-center">
-            <img class="img-fluid management-system-img" th:src="@{../img/management-system.png}" alt="">
+
+<!-- Main Content -->
+<main class="my-5">
+    <!-- Management System Image -->
+    <div class="container my-5">
+        <div class="text-center mb-4">
+            <h2 id="section-title" style="font-size: 2.5rem; color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); animation: fadeIn 3s infinite;">Why Choose Us?</h2>
+            <p style="color: white; background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 5px;">
+                Discover the key features of our school management system. We provide high-level security, efficient student management, and easy classroom creation to enhance your educational experience.
+            </p>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-4 feature-card" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
+                <img class="img-fluid management-system-img" th:src="@{../img/security.jpeg}" alt="High-Level Security" style="width: 100%; height: 300px; object-fit: cover; border-radius: 10px;">
+                <h4 style="margin-top: 15px;">High-Level Security</h4>
+                <p style="margin-top: 10px;">Our application ensures the highest level of security to protect your data and maintain confidentiality.</p>
+            </div>
+            <div class="col-md-4 feature-card" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
+                <img class="img-fluid management-system-img" th:src="@{../img/management-system.png}" alt="Manage Students" style="width: 100%; height: 300px; object-fit: cover; border-radius: 10px;">
+                <h4 style="margin-top: 15px;">Manage Students</h4>
+                <p style="margin-top: 10px;">Easily manage your students, track their progress, and communicate with them seamlessly.</p>
+            </div>
+            <div class="col-md-4 feature-card" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
+                <img class="img-fluid management-system-img" th:src="@{../img/classroom.jpeg}" alt="Create Classrooms" style="width: 100%; height: 300px; object-fit: cover; border-radius: 10px;">
+                <h4 style="margin-top: 15px;">Easy Classroom Creation</h4>
+                <p style="margin-top: 10px;">Creating classrooms has never been so easy! Organize your classes efficiently with our intuitive tools.</p>
+            </div>
         </div>
     </div>
 
-<!--    some words fragment-->
-    <div class="d-flex justify-content-center p-2 m-4 cards rounded shadow-sm">
-        <div class="d-flex flex-column mx-auto">
+
+    <!-- Some Words Fragment -->
+    <div class="container my-5">
+        <div class="cards rounded shadow-sm p-4">
             <div th:replace="components/someWords :: grid"></div>
         </div>
     </div>
-    <div th:replace="components/pricing :: pricing"></div>
 
+    <!-- Pricing Fragment -->
+    <div class="container my-5">
+        <div th:replace="components/pricing :: pricing"></div>
+    </div>
 
-<!--    email fragment-->
-
-    <div th:replace="components/emailUs :: email-us"></div>
+    <!-- Email Us Fragment -->
+    <div class="container my-5">
+        <div th:replace="components/emailUs :: email-us"></div>
+    </div>
 </main>
 
-
-
-<!--add footer fragment-->
-<footer th:replace="components/footer :: footer"></footer>
-
+<!-- Footer Fragment -->
+<footer th:replace="components/footer :: footer">
+    <div class="container text-center">
+        <p>&copy; 2024 School Management System. All rights reserved.</p>
+    </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>

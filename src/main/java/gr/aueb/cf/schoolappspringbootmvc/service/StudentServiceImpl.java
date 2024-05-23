@@ -1,6 +1,6 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
-import gr.aueb.cf.schoolappspringbootmvc.dto.RegisterStudentDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.student.RegisterStudentDTO;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.Mapper;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.User;
@@ -64,5 +64,16 @@ public class StudentServiceImpl implements IStudentService {
     @Override
     public List<Student> findAllStudents() throws Exception {
         return studentRepository.findAll();
+    }
+
+
+    @Override
+    public List<Student> findByLastnameContainingOrderByLastname(String lastname) {
+        return studentRepository.findByLastnameContainingOrderByLastname(lastname);
+    }
+
+    @Override
+    public List<Student> searchStudentsByLastname(String lastname) {
+        return studentRepository.findByLastnameContainingIgnoreCase(lastname);
     }
 }
