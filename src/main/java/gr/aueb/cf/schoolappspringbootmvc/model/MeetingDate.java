@@ -33,15 +33,13 @@ public class MeetingDate extends AbstractEntity {
     @Column(name = "ending_date")
     private LocalDate endDate;
 
-    @ManyToOne
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classroom_id", referencedColumnName = "id")
     private Classroom classroom;
 
-    /**
-     * Returns a string representation of the meeting date.
-     *
-     * @return a string representation of the meeting date
-     */
     @Override
     public String toString() {
         return "MeetingDate{" +
@@ -51,6 +49,7 @@ public class MeetingDate extends AbstractEntity {
                 ", endTime=" + endTime +
                 ", endDate=" + endDate +
                 ", classroom=" + classroom +
+                ", isActive=" + isActive +
                 '}';
     }
 }

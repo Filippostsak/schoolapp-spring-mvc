@@ -1,4 +1,4 @@
-package gr.aueb.cf.schoolappspringbootmvc.dto;
+package gr.aueb.cf.schoolappspringbootmvc.dto.student;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;

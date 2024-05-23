@@ -1,0 +1,34 @@
+#pricing-fragment {
+    animation: fadeIn 2s ease-in-out;
+}
+#pricing-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 40px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+#pricing-container .card {
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,121,113,1) 35%, rgba(0,212,255,1) 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+#pricing-container .card h4, #pricing-container .card h2, #pricing-container .card p {
+    margin-bottom: 15px;
+}
+#pricing-container .card .btn {
+    background-color: #007bff;
+    color: white;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+}
+#pricing-container .card .btn:hover {
+    background-color: #0056b3;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

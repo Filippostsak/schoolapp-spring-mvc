@@ -1,0 +1,74 @@
+
+body {
+    background: linear-gradient(to right, black, blue);
+    color: white;
+    font-family: Arial, sans-serif;
+}
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+h1, h4 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+.form-label {
+    color: white;
+}
+.form-control, .form-select {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+}
+.form-control::placeholder, .form-select {
+    color: rgba(255, 255, 255, 0.7);
+}
+.form-control:focus, .form-select:focus {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+.btn-link {
+    color: #007bff;
+    text-decoration: none;
+}
+.btn-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+.spinner-border {
+    display: none;
+}
+.alert {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+}
+.shadow-lg {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+}
+.content-section {
+    display: none;
+    padding: 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+.content-section.active {
+    display: block;
+    opacity: 1;
+    transform: scale(1);
+}
+.required-asterisk {
+    color: red;
+}

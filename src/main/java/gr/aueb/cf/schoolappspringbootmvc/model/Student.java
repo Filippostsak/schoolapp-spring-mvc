@@ -61,8 +61,8 @@ public class Student extends AbstractEntity {
      */
     public void setClassroom(Classroom classroom) {
         this.classroom = classroom;
-        if (classroom != null && !classroom.getStudents().contains(this)) {
-            classroom.getStudents().add(this);
+        if (classroom != null && !classroom.getStudentsOfClassroom().contains(this)) {
+            classroom.getStudentsOfClassroom().add(this);
         }
     }
 

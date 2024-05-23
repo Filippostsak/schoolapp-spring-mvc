@@ -43,5 +43,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param status the status of the users to count.
      * @return the number of users with the specified role and status.
      */
-    Long countByRoleAndStatus(Role role, String status);
+
 }

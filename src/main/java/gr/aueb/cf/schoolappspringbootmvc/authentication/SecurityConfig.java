@@ -69,10 +69,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/img/**").permitAll()
                         .requestMatchers("/styles/**").permitAll()
-                        .requestMatchers("/js/**").permitAll() // Allow access to JS files
+                        .requestMatchers("/js/**").permitAll()
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/register").permitAll()
+                        .requestMatchers("/features").permitAll()
+                        .requestMatchers("/pricing").permitAll()
                         .requestMatchers("/register/role").permitAll()
                         .requestMatchers("/register/teacher").permitAll()
                         .requestMatchers("/register/student").permitAll()

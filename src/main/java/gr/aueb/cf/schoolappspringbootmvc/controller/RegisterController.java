@@ -1,8 +1,8 @@
 package gr.aueb.cf.schoolappspringbootmvc.controller;
 
-import gr.aueb.cf.schoolappspringbootmvc.dto.RegisterTeacherDTO;
-import gr.aueb.cf.schoolappspringbootmvc.dto.RegisterStudentDTO;
-import gr.aueb.cf.schoolappspringbootmvc.dto.RegisterAdminDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.RegisterTeacherDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.student.RegisterStudentDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.admin.RegisterAdminDTO;
 import gr.aueb.cf.schoolappspringbootmvc.service.IAdminService;
 import gr.aueb.cf.schoolappspringbootmvc.service.IStudentService;
 import gr.aueb.cf.schoolappspringbootmvc.service.ITeacherService;

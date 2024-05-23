@@ -5,3 +5,67 @@
     padding: 2rem;
     border-radius: 8px;
 }
+
+body {
+    background: linear-gradient(to right, black, blue);
+    color: white;
+    font-family: Arial, sans-serif;
+}
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+h1, h3 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+.form-container {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    animation: slideIn 1s ease-in-out;
+}
+.form-label {
+    font-weight: bold;
+    color: white;
+}
+.form-control {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+}
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    color: white;
+}
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    width: 100%;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+.alert {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: red;
+}
+@keyframes slideIn {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
