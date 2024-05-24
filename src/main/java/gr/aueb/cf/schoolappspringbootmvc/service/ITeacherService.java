@@ -49,4 +49,22 @@ public interface ITeacherService {
      * @return an Optional containing the current teacher if found, otherwise empty.
      */
     Optional<Teacher> getCurrentAuthenticatedTeacher();
+
+    /**
+     * Retrieves a teacher by their username.
+     *
+     * @param username the username to search for.
+     * @return an Optional containing the teacher with the matching username if found, otherwise empty.
+     */
+
+    Optional<Teacher> findByUsername(String username);
+
+    /**
+     * Retrieves a teacher by their username containing the specified string.
+     *
+     * @param username the string to search for in the username.
+     * @return an Optional containing the teacher with the matching username if found, otherwise empty.
+     */
+
+    List<Teacher> findByUsernameContaining(String username) throws Exception;
 }

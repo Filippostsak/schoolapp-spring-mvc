@@ -151,6 +151,36 @@ public class TeacherServiceImpl implements ITeacherService {
         }
     }
 
+    @Override
+    public Optional<Teacher> findByUsername(String username) {
+        log.info("Searching for teacher with username: {}", username);
+        try {
+            Optional<Teacher> teacherOptional = teacherRepository.findByUserUsername(username);
+            if (teacherOptional.isPresent()) {
+                log.info("Teacher found with username: {}", username);
+            } else {
+                log.warn("No teacher found with username: {}", username);
+            }
+            return teacherOptional;
+        } catch (Exception e) {
+            log.error("Error searching for teacher with username: {}", username, e);
+            throw new RuntimeException("Error searching for teacher", e);
+        }
+    }
+
+    @Override
+    public List<Teacher> findByUsernameContaining(String username) throws Exception {
+        log.info("Searching for teachers with username containing: {}", username);
+        try {
+            List<Teacher> teachers = teacherRepository.findByUserUsernameContaining(username);
+            log.info("Successfully found {} teachers with username containing: {}", teachers.size(), username);
+            return teachers;
+        } catch (Exception e) {
+            log.error("Error searching for teachers with username containing: {}", username, e);
+            throw new Exception("Error searching for teachers", e);
+        }
+    }
+
     private String getCurrentUsername() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
@@ -159,4 +189,5 @@ public class TeacherServiceImpl implements ITeacherService {
             return principal.toString();
         }
     }
+
 }

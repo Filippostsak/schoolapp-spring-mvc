@@ -14,5 +14,6 @@ public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
     List<Classroom> findByStudentsOfClassroom_Id(Long studentId);
     boolean existsByName(String name);
     Page<Classroom> findByTeachers_Id(Long teacherId, Pageable pageable);
+    Optional<Classroom> findById(Long classroomId);
 
 }
