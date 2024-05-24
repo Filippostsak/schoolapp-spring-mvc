@@ -166,6 +166,7 @@ DTOs are used to transfer data between the client and server. Key DTOs include:
 - `SearchStudentDTO`
 - `SearchTeacherDTO`
 - `RegisterTeacherDTO`
+- `AddTeacherToClassroomDTO`
 
 #### Repositories
 Repositories interact with the database to perform CRUD operations. Key repositories include:
@@ -176,10 +177,10 @@ Repositories interact with the database to perform CRUD operations. Key reposito
 ##### ClassroomRepository
 - Handles CRUD operations for `Classroom` entities.
 - Provides custom query methods:
-    - `findByTeachers_Id(Long teacherId)`: Finds classrooms by teacher ID.
-    - `findByStudentsOfClassroom_Id(Long studentId)`: Finds classrooms by student ID.
-    - `existsByName(String name)`: Checks if a classroom exists by name.
-    - `findByTeachers_Id(Long teacherId, Pageable pageable)`: Finds classrooms by teacher ID with pagination.
+  - `findByTeachers_Id(Long teacherId)`: Finds classrooms by teacher ID.
+  - `findByStudentsOfClassroom_Id(Long studentId)`: Finds classrooms by student ID.
+  - `existsByName(String name)`: Checks if a classroom exists by name.
+  - `findByTeachers_Id(Long teacherId, Pageable pageable)`: Finds classrooms by teacher ID with pagination.
 
 ##### MeetingDateRepository
 - Handles CRUD operations for `MeetingDate` entities.
@@ -187,23 +188,23 @@ Repositories interact with the database to perform CRUD operations. Key reposito
 ##### StudentRepository
 - Handles CRUD operations for `Student` entities.
 - Provides custom query methods:
-    - `findByLastnameContainingOrderByLastname(String lastName)`: Finds students by last name containing a specific string, ordered by last name.
-    - `findByLastnameContainingIgnoreCase(String lastname)`: Finds students by last name containing a specific string, case insensitive.
+  - `findByLastnameContainingOrderByLastname(String lastName)`: Finds students by last name containing a specific string, ordered by last name.
+  - `findByLastnameContainingIgnoreCase(String lastname)`: Finds students by last name containing a specific string, case insensitive.
 
 ##### TeacherRepository
 - Handles CRUD operations for `Teacher` entities.
 - Provides custom query methods:
-    - `findByUserUsername(String username)`: Finds a teacher by their username.
-    - `findByClassrooms_Id(Long classroomId)`: Finds teachers by classroom ID.
-    - `findByFirstname(String firstname)`: Finds a teacher by their first name.
+  - `findByUserUsername(String username)`: Finds a teacher by their username.
+  - `findByClassrooms_Id(Long classroomId)`: Finds teachers by classroom ID.
+  - `findByFirstname(String firstname)`: Finds a teacher by their first name.
 
 ##### UserRepository
 - Handles CRUD operations for `User` entities.
 - Provides custom query methods:
-    - `findByRole(Role role)`: Finds a user by their role.
-    - `findByUsername(String username)`: Finds a user by their username.
-    - `countByRole(Role role)`: Counts the number of users with a specific role.
-    - `countByRoleAndStatus(Role role, Status status)`: Counts the number of users with a specific role and status.
+  - `findByRole(Role role)`: Finds a user by their role.
+  - `findByUsername(String username)`: Finds a user by their username.
+  - `countByRole(Role role)`: Counts the number of users with a specific role.
+  - `countByRoleAndStatus(Role role, Status status)`: Counts the number of users with a specific role and status.
 
 #### Mappers
 Mappers convert between DTOs and entities. The `Mapper` class includes methods like:

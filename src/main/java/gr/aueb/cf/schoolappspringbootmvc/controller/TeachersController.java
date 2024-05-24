@@ -123,20 +123,6 @@ public class TeachersController {
         }
     }
 
-    @PostMapping("/add-teacher")
-    public String addTeacher(@RequestParam("classroomId") Long classroomId,
-                             @RequestParam("teacherUsername") String teacherUsername,
-                             RedirectAttributes redirectAttributes) {
-        try {
-            classroomService.addTeacherToClassroom(classroomId, teacherUsername);
-            redirectAttributes.addFlashAttribute("success", "Teacher added successfully!");
-        } catch (Exception e) {
-            log.error("Error adding teacher to classroom", e);
-            redirectAttributes.addFlashAttribute("error", "An error occurred while adding the teacher. Please try again.");
-        }
-        return "redirect:/teachers/dashboard";
-    }
-
     @GetMapping("/your-classrooms")
     public String yourClassrooms(@RequestParam(defaultValue = "1") int page, Model model) {
         int pageSize = 10;
@@ -158,23 +144,6 @@ public class TeachersController {
         return "teachers/your-classrooms";
     }
 
-    @GetMapping("/check-classroom-name")
-    @ResponseBody
-    public ResponseEntity<Map<String, Boolean>> checkClassroomName(@RequestParam String name) {
-        boolean exists = classroomService.classroomNameExists(name);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("exists", exists);
-        return ResponseEntity.ok(response);
-    }
 
-    @DeleteMapping("/delete-classroom/{id}")
-    public String deleteClassroom(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        try {
-            classroomService.deleteClassroom(id);
-            redirectAttributes.addFlashAttribute("success", "Classroom deleted successfully!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "An error occurred while deleting the classroom.");
-        }
-        return "redirect:/teachers/your-classrooms";
-    }
+
 }

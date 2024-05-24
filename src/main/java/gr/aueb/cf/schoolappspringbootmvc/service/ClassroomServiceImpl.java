@@ -1,12 +1,15 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
 import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.CreateClassroomDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.AddTeacherToClassroomDTO;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.ClassroomMapper;
 import gr.aueb.cf.schoolappspringbootmvc.model.Classroom;
+import gr.aueb.cf.schoolappspringbootmvc.model.MeetingDate;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
 import gr.aueb.cf.schoolappspringbootmvc.repository.ClassroomRepository;
 import gr.aueb.cf.schoolappspringbootmvc.repository.TeacherRepository;
+import gr.aueb.cf.schoolappspringbootmvc.service.exceptions.ClassroomAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -126,28 +130,35 @@ public class ClassroomServiceImpl implements IClassroomService {
     @Override
     @Transactional
     public void deleteClassroom(Long classroomId) {
-        try {
-            Classroom classroom = classroomRepository.findById(classroomId)
-                    .orElseThrow(() -> new RuntimeException("Classroom not found"));
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new RuntimeException("Classroom not found"));
 
-            // Remove associations with teachers
-            for (Teacher teacher : classroom.getTeachers()) {
-                teacher.getClassrooms().remove(classroom);
-            }
-            classroom.getTeachers().clear();
-
-            // Remove associations with students
-            for (Student student : classroom.getStudentsOfClassroom()) {
-                student.setClassroom(null);
-            }
-            classroom.getStudentsOfClassroom().clear();
-
-            classroomRepository.delete(classroom);
-            log.info("Classroom deleted successfully with ID: {}", classroomId);
-        } catch (Exception e) {
-            log.error("Error deleting classroom ID: {}", classroomId, e);
-            throw new RuntimeException("Error deleting classroom", e);
+        // Remove associations with teachers
+        for (Teacher teacher : classroom.getTeachers()) {
+            teacher.getClassrooms().remove(classroom);
         }
+        classroom.getTeachers().clear();
+
+        // Remove associations with extra teachers
+        for (Teacher teacher : classroom.getExtraTeachers()) {
+            teacher.getExtraClassrooms().remove(classroom);
+        }
+        classroom.getExtraTeachers().clear();
+
+        // Remove associations with students
+        for (Student student : classroom.getStudentsOfClassroom()) {
+            student.setClassroom(null);
+        }
+        classroom.getStudentsOfClassroom().clear();
+
+        // Remove associated meeting dates
+        for (MeetingDate meetingDate : classroom.getMeetingDates()) {
+            meetingDate.setClassroom(null);
+        }
+        classroom.getMeetingDates().clear();
+
+        classroomRepository.delete(classroom);
+        log.info("Classroom deleted successfully with ID: {}", classroomId);
     }
 
     @Override
@@ -161,7 +172,6 @@ public class ClassroomServiceImpl implements IClassroomService {
     }
 
     @Override
-    @Transactional
     public void addTeacherToClassroom(Long classroomId, String teacherUsername) {
         try {
             Classroom classroom = classroomRepository.findById(classroomId)
@@ -170,7 +180,7 @@ public class ClassroomServiceImpl implements IClassroomService {
             Teacher teacher = teacherRepository.findByUserUsername(teacherUsername)
                     .orElseThrow(() -> new RuntimeException("Teacher not found"));
 
-            classroom.addTeacher(teacher);
+            classroom.addExtraTeacher(teacher); // Use addExtraTeacher method to add to extra_classroom_teachers table
             classroomRepository.save(classroom);
             log.info("Teacher {} added to classroom ID: {}", teacherUsername, classroomId);
         } catch (Exception e) {
@@ -179,8 +189,51 @@ public class ClassroomServiceImpl implements IClassroomService {
         }
     }
 
+
     @Override
     public Page<Classroom> findClassroomsByTeacher(Long teacherId, Pageable pageable) {
         return classroomRepository.findByTeachers_Id(teacherId, pageable);
+    }
+
+    @Override
+    public Optional<Classroom> findById(Long classroomId) throws Exception {
+        try{
+            return classroomRepository.findById(classroomId);
+        }catch (Exception e){
+            log.error("Error retrieving classroom with ID: {}", classroomId, e);
+            throw new Exception("Error retrieving classroom", e);
+        }
+    }
+
+    @Override
+    public void addTeacherToClassroom(AddTeacherToClassroomDTO dto) {
+        try {
+            Classroom classroom = classroomRepository.findById(dto.getClassroomId())
+                    .orElseThrow(() -> new RuntimeException("Classroom not found"));
+
+            Teacher teacher = teacherRepository.findByUserUsername(dto.getTeacherUsername())
+                    .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
+            classroom.addExtraTeacher(teacher); // Use addExtraTeacher method to add to extra_classroom_teachers table
+            classroomRepository.save(classroom);
+            log.info("Teacher {} added to classroom ID: {}", dto.getTeacherUsername(), dto.getClassroomId());
+        } catch (Exception e) {
+            log.error("Error adding teacher {} to classroom ID: {}", dto.getTeacherUsername(), dto.getClassroomId(), e);
+            throw new RuntimeException("Error adding teacher to classroom", e);
+        }
+    }
+
+
+    @Override
+    public void save(Classroom classroom) throws ClassroomAlreadyExistsException {
+        try {
+            if (classroomRepository.existsByName(classroom.getName())) {
+                throw new ClassroomAlreadyExistsException("Classroom with name " + classroom.getName() + " already exists");
+            }
+            classroomRepository.save(classroom);
+        } catch (Exception e) {
+            log.error("Error saving classroom", e);
+            throw new RuntimeException("Error saving classroom", e);
+        }
     }
 }

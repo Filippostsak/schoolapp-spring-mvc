@@ -82,6 +82,7 @@ public class SecurityConfig {
                         .requestMatchers("/students/**").hasAnyAuthority(Role.STUDENT.name())
                         .requestMatchers("/teachers/**").hasAnyAuthority(Role.TEACHER.name())
                         .requestMatchers("/admins/**").hasAnyAuthority(Role.ADMIN.name())
+                        .requestMatchers("/rest/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(formLogin -> formLogin

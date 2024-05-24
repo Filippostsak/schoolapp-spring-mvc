@@ -12,7 +12,7 @@ import java.util.Optional;
  */
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
     Optional<Teacher> findByUserUsername(String username);
-    List<Teacher> findByClassrooms_Id(Long classroomId);
+    List<Teacher> findByUserUsernameContaining(String username);
     Teacher findByFirstname(String firstname);
 
 }

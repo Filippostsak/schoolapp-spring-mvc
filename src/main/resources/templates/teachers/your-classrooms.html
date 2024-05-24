@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>Your Classrooms</title>
@@ -13,7 +13,7 @@
 <div class="container mt-5 mb-5">
   <h4 class="display-5 text-center mb-4">Hey, <span th:text="${firstname}">Teacher</span></h4>
   <div class="d-flex justify-content-center">
-    <p class="">here you can manage your classrooms!</p>
+    <p class="">Here you can manage your classrooms!</p>
   </div>
 
   <div class="row mt-5 mb-5">
@@ -27,15 +27,33 @@
       <div th:if="${classrooms}">
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="classroomGrid">
           <div class="col" th:each="classroom : ${classrooms}">
-            <div class="card">
+            <div class="card h-100">
               <div class="card-body">
                 <h4 class="card-title" th:text="${classroom.name}">Classroom Name</h4>
-                <p class="card-text" th:text="${classroom.description}">Classroom Description</p>
-                <p class="card-text"><small th:text="${#temporals.format(classroom.createdAt, 'dd/MM/yyyy')}">Created At</small></p>
-                <button class="btn btn-primary btn-sm" onclick="openAddTeacherModal([[${classroom.id}]])">Add Teacher</button>
-                <a th:href="@{/teachers/classroom-details/{id}(id=${classroom.id})}" class="btn btn-secondary btn-sm">View Details</a>
-                <a th:href="@{/teachers/update-classroom/{id}(id=${classroom.id})}" class="btn btn-warning btn-sm">Update</a>
-                <button class="btn btn-danger btn-sm" onclick="deleteClassroom([[${classroom.id}]])">Delete</button>
+                <p class="card-text"><strong>Description:</strong> <span th:text="${classroom.description}">Classroom Description</span></p>
+                <p class="card-text"><strong>Created At:</strong> <span th:text="${#temporals.format(classroom.createdAt, 'dd/MM/yyyy')}">Created At</span></p>
+                <div class="card-buttons">
+                  <button class="btn btn-primary btn-sm" th:onclick="'openAddTeacherModal(' + ${classroom.id} + ')'">Add Teacher</button>
+                  <a th:href="@{/teachers/classroom-details/{id}(id=${classroom.id})}" class="btn btn-secondary btn-sm">View Details</a>
+                  <a th:href="@{/teachers/update-classroom/{id}(id=${classroom.id})}" class="btn btn-warning btn-sm">Update</a>
+                  <button class="btn btn-danger btn-sm" th:data-id="${classroom.id}" th:data-name="${classroom.name}" onclick="openDeleteModal(this)">Delete</button>
+                </div>
+
+                <!-- Displaying the creator of the classroom -->
+                <div class="mt-3">
+                  <h6>Creator:</h6>
+                  <small class="creator-name" th:text="${classroom.creator.user.username}">Creator Username</small>
+                </div>
+
+                <!-- Displaying the added teachers in the classroom -->
+                <div class="mt-3">
+                  <h6>Teachers:</h6>
+                  <ul class="list-unstyled">
+                    <li th:each="teacher : ${classroom.extraTeachers}">
+                      <small class="teacher-name" th:text="${teacher.user.username}">Teacher Username</small>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -59,27 +77,54 @@
   </div>
 </div>
 
-<!-- Modal for Adding Teacher -->
+<!-- Add Teacher Modal -->
 <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addTeacherModalLabel">Add Teacher</h5>
+        <h5 class="modal-title" id="addTeacherModalLabel">Add a New Teacher to Your Classroom</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form id="addTeacherForm" th:action="@{/teachers/add-teacher}" method="post">
-        <div class="modal-body">
+      <div class="modal-body">
+        <form id="addTeacherForm">
           <input type="hidden" id="classroomId" name="classroomId">
           <div class="mb-3">
             <label for="teacherUsername" class="form-label">Teacher Username</label>
-            <input type="text" class="form-control" id="teacherUsername" name="teacherUsername" required>
+            <input type="text" class="form-control" id="teacherUsername" name="teacherUsername" placeholder="Enter the username of the teacher you want to add" onkeyup="searchTeacherUsernames()" required>
+            <ul class="list-group mt-2" id="teacherSearchResults" style="display:none;"></ul>
           </div>
+        </form>
+        <div class="alert alert-info" role="alert">
+          Please ensure the username is correct. The teacher will gain access to this classroom upon addition.
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Add Teacher</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="addTeacher()">Add Teacher</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Confirming Deletion -->
+<div class="modal fade" id="deleteClassroomModal" tabindex="-1" aria-labelledby="deleteClassroomModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteClassroomModalLabel">Confirm Classroom Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>To confirm the deletion of this classroom, please enter the classroom name below:</p>
+        <input type="text" class="form-control" id="confirmClassroomName" placeholder="Enter classroom name">
+        <div class="alert alert-warning mt-3" role="alert">
+          Warning: This action cannot be undone. Please ensure you have entered the correct classroom name.
         </div>
-      </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete Classroom</button>
+      </div>
     </div>
   </div>
 </div>
@@ -87,6 +132,6 @@
 <footer th:replace="~{components/footer :: footer}"></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script src="../../js/teacherYourClassrooms.js"></script>
+<script src="../../js/teachersYourClassrooms.js"></script>
 </body>
 </html>

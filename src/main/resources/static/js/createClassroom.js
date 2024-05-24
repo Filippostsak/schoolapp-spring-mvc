@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function checkClassroomNameExists(name) {
         try {
-            const response = await fetch(`/teachers/check-classroom-name?name=${encodeURIComponent(name)}`);
+            const response = await fetch(`/rest/teachers/check-classroom-name?name=${encodeURIComponent(name)}`);
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
             }
