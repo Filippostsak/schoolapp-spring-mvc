@@ -1,6 +1,8 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
+import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.ClassroomUpdateDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.CreateClassroomDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.meetingDate.MeetingUpdateDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.AddTeacherToClassroomDTO;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.ClassroomMapper;
 import gr.aueb.cf.schoolappspringbootmvc.model.Classroom;
@@ -8,6 +10,8 @@ import gr.aueb.cf.schoolappspringbootmvc.model.MeetingDate;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
 import gr.aueb.cf.schoolappspringbootmvc.repository.ClassroomRepository;
+import gr.aueb.cf.schoolappspringbootmvc.repository.MeetingDateRepository;
+import gr.aueb.cf.schoolappspringbootmvc.repository.StudentRepository;
 import gr.aueb.cf.schoolappspringbootmvc.repository.TeacherRepository;
 import gr.aueb.cf.schoolappspringbootmvc.service.exceptions.ClassroomAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,8 @@ public class ClassroomServiceImpl implements IClassroomService {
 
     private final ClassroomRepository classroomRepository;
     private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
+    private final MeetingDateRepository meetingDateRepository;
     private final ClassroomMapper classroomMapper;
     private final ITeacherService teacherService;
 
@@ -55,6 +61,7 @@ public class ClassroomServiceImpl implements IClassroomService {
             throw new RuntimeException("Error creating classroom", e);
         }
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -235,5 +242,64 @@ public class ClassroomServiceImpl implements IClassroomService {
             log.error("Error saving classroom", e);
             throw new RuntimeException("Error saving classroom", e);
         }
+    }
+
+    @Override
+    @Transactional
+    public Classroom updateClassroomDetails(Long classroomId, ClassroomUpdateDTO classroomUpdateDTO) {
+        Teacher currentTeacher = teacherService.getCurrentAuthenticatedTeacher()
+                .orElseThrow(() -> new RuntimeException("Authenticated teacher not found"));
+
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new RuntimeException("Classroom not found"));
+
+        if (!classroom.getCreator().equals(currentTeacher)) {
+            throw new RuntimeException("Teacher not authorized to update this classroom");
+        }
+
+        classroomMapper.updateClassroomFromDTO(classroomUpdateDTO, classroom);
+
+        return classroomRepository.save(classroom);
+    }
+
+    @Override
+    @Transactional
+    public void removeStudentFromClassroom(Long classroomId, Long studentId) {
+        Teacher currentTeacher = teacherService.getCurrentAuthenticatedTeacher()
+                .orElseThrow(() -> new RuntimeException("Authenticated teacher not found"));
+
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new RuntimeException("Classroom not found"));
+
+        if (!classroom.getCreator().equals(currentTeacher)) {
+            throw new RuntimeException("Teacher not authorized to remove students from this classroom");
+        }
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        classroom.removeStudent(student);
+        studentRepository.save(student); // Persist changes
+    }
+
+    @Override
+    @Transactional
+    public MeetingDate updateMeetingDate(Long classroomId, Long meetingDateId, MeetingUpdateDTO meetingUpdateDTO) {
+        Teacher currentTeacher = teacherService.getCurrentAuthenticatedTeacher()
+                .orElseThrow(() -> new RuntimeException("Authenticated teacher not found"));
+
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new RuntimeException("Classroom not found"));
+
+        if (!classroom.getCreator().equals(currentTeacher)) {
+            throw new RuntimeException("Teacher not authorized to update meeting dates for this classroom");
+        }
+
+        MeetingDate meetingDate = meetingDateRepository.findById(meetingDateId)
+                .orElseThrow(() -> new RuntimeException("Meeting date not found"));
+
+        classroomMapper.updateMeetingDateFromDTO(meetingUpdateDTO, meetingDate);
+
+        return meetingDateRepository.save(meetingDate);
     }
 }
