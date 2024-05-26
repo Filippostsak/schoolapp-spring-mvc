@@ -1,8 +1,11 @@
 package gr.aueb.cf.schoolappspringbootmvc.mapper;
 
+import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.ClassroomUpdateDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.CreateClassroomDTO;
-import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.AddTeacherToClassroomDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.meetingDate.CreateMeetingDateDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.meetingDate.MeetingUpdateDTO;
 import gr.aueb.cf.schoolappspringbootmvc.model.Classroom;
+import gr.aueb.cf.schoolappspringbootmvc.model.MeetingDate;
 import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
 import gr.aueb.cf.schoolappspringbootmvc.repository.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +36,29 @@ public class ClassroomMapper {
         }
 
         return classroom;
+    }
+
+    public void updateClassroomFromDTO(ClassroomUpdateDTO dto, Classroom classroom) {
+        classroom.setName(dto.getName());
+        classroom.setDescription(dto.getDescription());
+        classroom.setClassroomUrl(dto.getClassroomUrl());
+        classroom.setImageUrl(dto.getImageUrl());
+        classroom.setActive(dto.isActive());
+    }
+
+    public void updateMeetingDateFromDTO(MeetingUpdateDTO dto, MeetingDate meetingDate) {
+        meetingDate.setDate(dto.getDate());
+        meetingDate.setTime(dto.getTime());
+        meetingDate.setEndTime(dto.getEndTime());
+        meetingDate.setEndDate(dto.getEndDate());
+    }
+
+    public MeetingDate toMeetingDate(CreateMeetingDateDTO dto) {
+        MeetingDate meetingDate = new MeetingDate();
+        meetingDate.setDate(dto.getDate());
+        meetingDate.setTime(dto.getTime());
+        meetingDate.setEndTime(dto.getEndTime());
+        meetingDate.setEndDate(dto.getEndDate());
+        return meetingDate;
     }
 }

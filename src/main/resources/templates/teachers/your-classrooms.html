@@ -35,19 +35,20 @@
                 <div class="card-buttons">
                   <button class="btn btn-primary btn-sm" th:onclick="'openAddTeacherModal(' + ${classroom.id} + ')'">Add Teacher</button>
                   <a th:href="@{/teachers/classroom-details/{id}(id=${classroom.id})}" class="btn btn-secondary btn-sm">View Details</a>
-                  <a th:href="@{/teachers/update-classroom/{id}(id=${classroom.id})}" class="btn btn-warning btn-sm">Update</a>
+                  <a href="#" class="btn btn-warning btn-sm" th:onclick="'openUpdateClassroomModal(' + ${classroom.id} + ')'">Update</a>
                   <button class="btn btn-danger btn-sm" th:data-id="${classroom.id}" th:data-name="${classroom.name}" onclick="openDeleteModal(this)">Delete</button>
+                  <button class="btn btn-info btn-sm" th:onclick="'openSetMeetingModal(' + ${classroom.id} + ')'">Set Meeting</button>
                 </div>
 
                 <!-- Displaying the creator of the classroom -->
                 <div class="mt-3">
-                  <h6>Creator:</h6>
+                  <h6 class="text-dark">Creator:</h6>
                   <small class="creator-name" th:text="${classroom.creator.user.username}">Creator Username</small>
                 </div>
 
                 <!-- Displaying the added teachers in the classroom -->
                 <div class="mt-3">
-                  <h6>Teachers:</h6>
+                  <h6 class="text-dark">Teachers:</h6>
                   <ul class="list-unstyled">
                     <li th:each="teacher : ${classroom.extraTeachers}">
                       <small class="teacher-name" th:text="${teacher.user.username}">Teacher Username</small>
@@ -68,7 +69,7 @@
         <a class="btn btn-outline-primary me-2" th:href="@{/teachers/your-classrooms(page=${currentPage - 1})}" th:classappend="${currentPage == 1} ? 'disabled'">
           &laquo; Previous
         </a>
-        <span class="text-white mx-2">Page <span th:text="${currentPage}"></span> of <span th:text="${totalPages}"></span></span>
+        <span class="text-dark mx-2">Page <span th:text="${currentPage}"></span> of <span th:text="${totalPages}"></span></span>
         <a class="btn btn-outline-primary ms-2" th:href="@{/teachers/your-classrooms(page=${currentPage + 1})}" th:classappend="${currentPage == totalPages} ? 'disabled'">
           Next &raquo;
         </a>
@@ -82,20 +83,23 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addTeacherModalLabel">Add a New Teacher to Your Classroom</h5>
+        <h5 class="modal-title text-dark" id="addTeacherModalLabel">Add a New Teacher to Your Classroom</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="addTeacherForm">
           <input type="hidden" id="classroomId" name="classroomId">
           <div class="mb-3">
-            <label for="teacherUsername" class="form-label">Teacher Username</label>
+            <label for="teacherUsername" class="form-label text-dark">Teacher Username</label>
             <input type="text" class="form-control" id="teacherUsername" name="teacherUsername" placeholder="Enter the username of the teacher you want to add" onkeyup="searchTeacherUsernames()" required>
             <ul class="list-group mt-2" id="teacherSearchResults" style="display:none;"></ul>
           </div>
         </form>
-        <div class="alert alert-info" role="alert">
-          Please ensure the username is correct. The teacher will gain access to this classroom upon addition.
+        <div class="spinner-border text-primary" role="status" id="addTeacherSpinner" style="display: none;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="alert alert-info mt-3" role="alert" id="addTeacherInfo" style="display: none;">
+          Adding teacher. Please wait...
         </div>
       </div>
       <div class="modal-footer">
@@ -111,14 +115,20 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="deleteClassroomModalLabel">Confirm Classroom Deletion</h5>
+        <h5 class="modal-title text-dark" id="deleteClassroomModalLabel">Confirm Classroom Deletion</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>To confirm the deletion of this classroom, please enter the classroom name below:</p>
+        <p class="text-dark">To confirm the deletion of this classroom, please enter the classroom name below:</p>
         <input type="text" class="form-control" id="confirmClassroomName" placeholder="Enter classroom name">
         <div class="alert alert-warning mt-3" role="alert">
           Warning: This action cannot be undone. Please ensure you have entered the correct classroom name.
+        </div>
+        <div class="spinner-border text-primary" role="status" id="deleteClassroomSpinner" style="display: none;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="alert alert-info mt-3" role="alert" id="deleteClassroomInfo" style="display: none;">
+          Deleting classroom. Please wait...
         </div>
       </div>
       <div class="modal-footer">
@@ -128,6 +138,103 @@
     </div>
   </div>
 </div>
+
+<!-- Update Classroom Modal -->
+<div class="modal fade" id="updateClassroomModal" tabindex="-1" aria-labelledby="updateClassroomModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-dark" id="updateClassroomModalLabel">Update Classroom Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="updateClassroomForm">
+          <input type="hidden" id="classroomIdUpdate" name="classroomId">
+          <div class="mb-3">
+            <label for="classroomNameUpdate" class="form-label text-dark">Classroom Name</label>
+            <input type="text" class="form-control" id="classroomNameUpdate" name="classroomName" placeholder="Enter new classroom name" required>
+          </div>
+          <div class="mb-3">
+            <label for="classroomDescriptionUpdate" class="form-label text-dark">Description</label>
+            <textarea class="form-control" id="classroomDescriptionUpdate" name="classroomDescription" rows="3" placeholder="Enter new classroom description" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="classroomUrlUpdate" class="form-label text-dark">Classroom URL</label>
+            <input type="text" class="form-control" id="classroomUrlUpdate" name="classroomUrl" placeholder="Enter new classroom URL">
+          </div>
+          <div class="mb-3">
+            <label for="imageUrlUpdate" class="form-label text-dark">Image URL</label>
+            <input type="text" class="form-control" id="imageUrlUpdate" name="imageUrl" placeholder="Enter new image URL">
+          </div>
+        </form>
+        <div class="spinner-border text-primary" role="status" id="updateClassroomSpinner" style="display: none;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="alert alert-info mt-3" role="alert" id="updateClassroomInfo" style="display: none;">
+          Updating classroom details. Please wait...
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-warning" onclick="updateClassroomDetails()">Update Classroom</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Set Meeting Modal -->
+<div class="modal fade" id="setMeetingModal" tabindex="-1" aria-labelledby="setMeetingModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-dark" id="setMeetingModalLabel">Set Meeting Date and Time</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="setMeetingForm">
+          <input type="hidden" id="classroomIdMeeting" name="classroomId">
+          <input type="hidden" id="meetingId" name="meetingId">
+          <div class="mb-3">
+            <label for="meetingDate" class="form-label text-dark">Date</label>
+            <input type="date" class="form-control" id="meetingDate" name="date" required>
+          </div>
+          <div class="mb-3">
+            <label for="meetingTime" class="form-label text-dark">Start Time</label>
+            <input type="time" class="form-control" id="meetingTime" name="time" required>
+          </div>
+          <div class="mb-3">
+            <label for="meetingEndTime" class="form-label text-dark">End Time</label>
+            <input type="time" class="form-control" id="meetingEndTime" name="endTime" required>
+          </div>
+          <div class="mb-3">
+            <label for="meetingEndDate" class="form-label text-dark">End Date</label>
+            <input type="date" class="form-control" id="meetingEndDate" name="endDate" required>
+          </div>
+        </form>
+        <div class="spinner-border text-primary" role="status" id="setMeetingSpinner" style="display: none;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="alert alert-info mt-3" role="alert" id="setMeetingInfo" style="display: none;">
+          Setting meeting date and time. Please wait...
+        </div>
+        <div class="alert alert-success mt-3" role="alert" id="setMeetingSuccess" style="display: none;">
+          Meeting date and time set successfully!
+        </div>
+        <div class="alert alert-danger mt-3" role="alert" id="setMeetingFailure" style="display: none;">
+          Failed to set meeting date and time. Please try again.
+        </div>
+        <div class="alert alert-danger mt-3" role="alert" id="setMeetingError" style="display: none;">
+          An error occurred while setting the meeting. Please try again.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-info" onclick="setMeeting()">Set Meeting</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <footer th:replace="~{components/footer :: footer}"></footer>
 

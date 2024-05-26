@@ -43,7 +43,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function checkClassroomNameExists(name) {
         try {
-            const response = await fetch(`/rest/teachers/check-classroom-name?name=${encodeURIComponent(name)}`);
+            const response = await fetch(`/teachers/check-classroom-name?name=${encodeURIComponent(name)}`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
             }
@@ -51,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return result.exists;
         } catch (error) {
             console.error("Error checking classroom name:", error);
+            showCustomErrorMessage("An error occurred while checking the classroom name.");
             return false;
         }
     }
