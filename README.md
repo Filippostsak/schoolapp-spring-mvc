@@ -22,8 +22,7 @@ This project is a School Management Application developed using the Spring Boot 
 - Thymeleaf
 - MySQL
 - Spring Security
-- TestNG
-- Mockito
+- Unit Testing
 
 ### Project Structure
 
