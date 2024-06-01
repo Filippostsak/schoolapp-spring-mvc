@@ -1,5 +1,6 @@
 package gr.aueb.cf.schoolappspringbootmvc.repository;
 
+import gr.aueb.cf.schoolappspringbootmvc.dto.student.AddStudentToClassroomDTO;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 

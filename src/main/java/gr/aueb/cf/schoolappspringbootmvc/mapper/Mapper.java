@@ -2,6 +2,7 @@ package gr.aueb.cf.schoolappspringbootmvc.mapper;
 
 import gr.aueb.cf.schoolappspringbootmvc.dto.admin.RegisterAdminDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.student.RegisterStudentDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.GetTeachersIdDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.RegisterTeacherDTO;
 import gr.aueb.cf.schoolappspringbootmvc.model.Admin;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
@@ -129,5 +130,9 @@ public class Mapper {
                 dto.getCountry(),
                 dto.getCity()
         );
+    }
+
+    public static GetTeachersIdDTO extractGetTeachersIdDTOFromTeacher(Teacher teacher) {
+        return new GetTeachersIdDTO(teacher.getId(), teacher.getFirstname(), teacher.getLastname());
     }
 }

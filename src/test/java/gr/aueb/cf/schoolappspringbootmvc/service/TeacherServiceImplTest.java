@@ -1,29 +1,30 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.RegisterTeacherDTO;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.Mapper;
+import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
 import gr.aueb.cf.schoolappspringbootmvc.model.User;
 import gr.aueb.cf.schoolappspringbootmvc.repository.TeacherRepository;
 import gr.aueb.cf.schoolappspringbootmvc.repository.UserRepository;
 import gr.aueb.cf.schoolappspringbootmvc.service.exceptions.TeacherAlreadyExistsException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
-import java.util.Collections;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
 
-/**
- * Unit tests for the {@link TeacherServiceImpl} class.
- */
 public class TeacherServiceImplTest {
 
     @Mock
@@ -35,87 +36,157 @@ public class TeacherServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private StudentServiceImpl studentServiceImpl;
+
     @InjectMocks
     private TeacherServiceImpl teacherService;
 
-    /**
-     * Sets up the test environment. Initializes mocks and injects them into the tested class.
-     */
-    @BeforeMethod
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
-    /**
-     * Tests the {@link TeacherServiceImpl#registerTeacher(RegisterTeacherDTO)} method.
-     * Verifies that a teacher is registered successfully when the user does not already exist.
-     */
     @Test
-    public void testRegisterTeacher() {
-        RegisterTeacherDTO dto = new RegisterTeacherDTO();
-        dto.setUsername("testuser");
-        dto.setPassword("testpassword");
+    public void testRegisterTeacherSuccess() throws TeacherAlreadyExistsException {
+        RegisterTeacherDTO dto = new RegisterTeacherDTO(
+                "newTeacher", "newTeacher@example.com", "Password1!", "Password1!",
+                "John", "Doe", LocalDate.of(1980, 1, 1), "Country", "City"
+        );
 
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword("testpassword");
+        User user = Mapper.extractUserFromRegisterTeacherDTO(dto);
+        Teacher teacher = Mapper.extractTeacherFromRegisterTeacherDTO(dto);
 
-        Teacher teacher = new Teacher();
-        teacher.addUser(user);
-
-        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(any(CharSequence.class))).thenReturn("encodedPassword");
+        when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(dto.getPassword())).thenReturn("encodedPassword");
         when(teacherRepository.save(any(Teacher.class))).thenReturn(teacher);
 
-        try {
-            Teacher result = teacherService.registerTeacher(dto);
-            assertNotNull(result);
-            assertNotNull(result.getUser());
-            assertEquals(result.getUser().getUsername(), "testuser");
-            verify(userRepository, times(1)).findByUsername("testuser");
-            verify(passwordEncoder, times(1)).encode("testpassword");
-            verify(teacherRepository, times(1)).save(any(Teacher.class));
-        } catch (TeacherAlreadyExistsException e) {
-            fail("TeacherAlreadyExistsException should not be thrown");
-        }
+        Teacher registeredTeacher = teacherService.registerTeacher(dto);
+
+        assertNotNull(registeredTeacher);
+        assertEquals(dto.getUsername(), registeredTeacher.getUser().getUsername());
+        verify(userRepository, times(1)).findByUsername(dto.getUsername());
+        verify(passwordEncoder, times(1)).encode(dto.getPassword());
+        verify(teacherRepository, times(1)).save(any(Teacher.class));
     }
 
-    /**
-     * Tests the {@link TeacherServiceImpl#registerTeacher(RegisterTeacherDTO)} method.
-     * Verifies that a {@link TeacherAlreadyExistsException} is thrown when a teacher with the specified username already exists.
-     *
-     * @throws TeacherAlreadyExistsException if a teacher with the specified username already exists.
-     */
-    @Test(expectedExceptions = TeacherAlreadyExistsException.class)
-    public void testRegisterTeacherThrowsException() throws TeacherAlreadyExistsException {
-        RegisterTeacherDTO dto = new RegisterTeacherDTO();
-        dto.setUsername("existinguser");
-        dto.setPassword("password");
-
-        User existingUser = new User();
-        existingUser.setUsername("existinguser");
-
-        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(existingUser));
-
-        teacherService.registerTeacher(dto);
-    }
-
-    /**
-     * Tests the {@link TeacherServiceImpl#findAllTeachers()} method.
-     * Verifies that the method returns a list of all teachers.
-     */
     @Test
-    public void testFindAllTeachers() {
-        Teacher teacher = new Teacher();
-        when(teacherRepository.findAll()).thenReturn(Collections.singletonList(teacher));
+    public void testRegisterTeacherAlreadyExists() {
+        RegisterTeacherDTO dto = new RegisterTeacherDTO(
+                "existingTeacher", "existingTeacher@example.com", "Password1!", "Password1!",
+                "John", "Doe", LocalDate.of(1980, 1, 1), "Country", "City"
+        );
 
-        try {
-            List<Teacher> teachers = teacherService.findAllTeachers();
-            assertNotNull(teachers);
-            assertEquals(teachers.size(), 1);
-            verify(teacherRepository, times(1)).findAll();
-        } catch (Exception e) {
-            fail("Exception should not be thrown");
-        }
+        when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.of(new User()));
+
+        TeacherAlreadyExistsException exception = assertThrows(TeacherAlreadyExistsException.class, () -> teacherService.registerTeacher(dto));
+
+        assertEquals("existingTeacher", exception.getMessage());
+        verify(userRepository, times(1)).findByUsername(dto.getUsername());
+        verify(teacherRepository, never()).save(any(Teacher.class));
+    }
+
+    @Test
+    public void testFindAllTeachers() throws Exception {
+        List<Teacher> mockTeachers = List.of(new Teacher(), new Teacher());
+
+        when(teacherRepository.findAll()).thenReturn(mockTeachers);
+
+        List<Teacher> teachers = teacherService.findAllTeachers();
+
+        assertEquals(mockTeachers.size(), teachers.size());
+        verify(teacherRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testFindAllTeachersException() {
+        when(teacherRepository.findAll()).thenThrow(new RuntimeException("Database error"));
+
+        Exception exception = assertThrows(Exception.class, () -> teacherService.findAllTeachers());
+
+        assertEquals("Error retrieving all teachers", exception.getMessage());
+        verify(teacherRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testSearchStudentsByLastName() {
+        String lastName = "Smith";
+        List<Student> mockStudents = List.of(new Student(), new Student());
+
+        when(studentServiceImpl.findByLastnameContainingOrderByLastname(lastName)).thenReturn(mockStudents);
+
+        List<Student> students = teacherService.searchStudentsByLastName(lastName);
+
+        assertEquals(mockStudents.size(), students.size());
+        verify(studentServiceImpl, times(1)).findByLastnameContainingOrderByLastname(lastName);
+    }
+
+    @Test
+    public void testFindTeacherByFirstname() {
+        String firstname = "John";
+        Teacher mockTeacher = new Teacher();
+
+        when(teacherRepository.findByFirstname(firstname)).thenReturn(mockTeacher);
+
+        Teacher teacher = teacherService.findTeacherByFirstname(firstname);
+
+        assertNotNull(teacher);
+        verify(teacherRepository, times(1)).findByFirstname(firstname);
+    }
+
+    @Test
+    public void testGetCurrentAuthenticatedTeacher() {
+        String username = "authenticatedUser";
+        User user = new User();
+        user.setUsername(username);
+        Teacher mockTeacher = new Teacher();
+        mockTeacher.addUser(user);
+
+        UserDetails userDetails = mock(UserDetails.class);
+        when(userDetails.getUsername()).thenReturn(username);
+
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(mock(org.springframework.security.core.Authentication.class));
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(userDetails);
+
+        SecurityContextHolder.setContext(securityContext);
+
+        when(teacherRepository.findByUserUsername(username)).thenReturn(Optional.of(mockTeacher));
+
+        Optional<Teacher> teacher = teacherService.getCurrentAuthenticatedTeacher();
+
+        assertTrue(teacher.isPresent());
+        assertEquals(username, teacher.get().getUser().getUsername());
+        verify(teacherRepository, times(1)).findByUserUsername(username);
+    }
+
+    @Test
+    public void testFindByUsername() {
+        String username = "user1";
+        User user = new User();
+        user.setUsername(username);
+        Teacher mockTeacher = new Teacher();
+        mockTeacher.addUser(user);
+
+        when(teacherRepository.findByUserUsername(username)).thenReturn(Optional.of(mockTeacher));
+
+        Optional<Teacher> teacher = teacherService.findByUsername(username);
+
+        assertTrue(teacher.isPresent());
+        assertEquals(username, teacher.get().getUser().getUsername());
+        verify(teacherRepository, times(1)).findByUserUsername(username);
+    }
+
+    @Test
+    public void testFindByUsernameContaining() throws Exception {
+        String username = "user";
+        List<Teacher> mockTeachers = List.of(new Teacher(), new Teacher());
+
+        when(teacherRepository.findByUserUsernameContaining(username)).thenReturn(mockTeachers);
+
+        List<Teacher> teachers = teacherService.findByUsernameContaining(username);
+
+        assertEquals(mockTeachers.size(), teachers.size());
+        verify(teacherRepository, times(1)).findByUserUsernameContaining(username);
     }
 }

@@ -1,22 +1,19 @@
-package gr.aueb.cf.schoolappspringbootmvc.dto.student;
+package gr.aueb.cf.schoolappspringbootmvc.dto.teacher;
 
-import gr.aueb.cf.schoolappspringbootmvc.model.Classroom;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class SearchStudentDTO {
+public class TeacherReadOnlyDTO {
 
     private Long id;
     private String firstname;
     private String lastname;
-    private List<Long> classroomIds;
     private String email;
-    private String country;
+    private String username;
 }

@@ -2,22 +2,18 @@ package gr.aueb.cf.schoolappspringbootmvc.service;
 
 import gr.aueb.cf.schoolappspringbootmvc.model.User;
 import gr.aueb.cf.schoolappspringbootmvc.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-/**
- * Unit tests for the {@link UserServiceImpl} class.
- */
 public class UserServiceImplTest {
 
     @Mock
@@ -26,46 +22,59 @@ public class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userService;
 
-    /**
-     * Sets up the test environment. Initializes mocks and injects them into the tested class.
-     */
-    @BeforeMethod
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
-    /**
-     * Tests the {@link UserServiceImpl#getUserByUsername(String)} method.
-     * Verifies that the method returns the expected user when the user exists.
-     */
     @Test
-    public void testGetUserByUsername_UserExists() {
-        // Arrange
+    public void testGetUserByUsernameSuccess() {
         String username = "testUser";
-        User expectedUser = new User();
-        expectedUser.setUsername(username);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(expectedUser));
+        User mockUser = new User();
+        mockUser.setUsername(username);
 
-        // Act
-        User actualUser = userService.getUserByUsername(username);
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(mockUser));
 
-        // Assert
-        assertEquals(actualUser, expectedUser);
+        User user = userService.getUserByUsername(username);
+
+        assertNotNull(user);
+        assertEquals(username, user.getUsername());
+        verify(userRepository, times(1)).findByUsername(username);
+        verifyNoMoreInteractions(userRepository);
     }
 
-    /**
-     * Tests the {@link UserServiceImpl#getUserByUsername(String)} method.
-     * Verifies that the method throws a {@link UsernameNotFoundException} when the user is not found.
-     */
     @Test
-    public void testGetUserByUsername_UserNotFound() {
-        // Arrange
+    public void testGetUserByUsernameNotFound() {
         String username = "nonExistentUser";
+
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        assertThrows(UsernameNotFoundException.class, () -> {
-            userService.getUserByUsername(username);
-        });
+        Exception exception = assertThrows(UsernameNotFoundException.class, () -> userService.getUserByUsername(username));
+
+        assertEquals("User with username " + username + " not found", exception.getMessage());
+        verify(userRepository, times(1)).findByUsername(username);
+        verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test
+    public void testGetUserByUsernameWithNull() {
+        Exception exception = assertThrows(UsernameNotFoundException.class, () -> userService.getUserByUsername(null));
+
+        assertEquals("User with username null not found", exception.getMessage());
+        verify(userRepository, times(1)).findByUsername(null);
+        verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test
+    public void testGetUserByUsernameWithEmptyString() {
+        String username = "";
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(UsernameNotFoundException.class, () -> userService.getUserByUsername(username));
+
+        assertEquals("User with username  not found", exception.getMessage());
+        verify(userRepository, times(1)).findByUsername(username);
+        verifyNoMoreInteractions(userRepository);
     }
 }

@@ -34,7 +34,7 @@
                 <p class="card-text"><strong>Created At:</strong> <span th:text="${#temporals.format(classroom.createdAt, 'dd/MM/yyyy')}">Created At</span></p>
                 <div class="card-buttons">
                   <button class="btn btn-primary btn-sm" th:onclick="'openAddTeacherModal(' + ${classroom.id} + ')'">Add Teacher</button>
-                  <a th:href="@{/teachers/classroom-details/{id}(id=${classroom.id})}" class="btn btn-secondary btn-sm">View Details</a>
+                  <button class="btn btn-secondary btn-sm" th:onclick="'viewClassroomDetails(' + ${classroom.id} + ')'">View Details</button>
                   <a href="#" class="btn btn-warning btn-sm" th:onclick="'openUpdateClassroomModal(' + ${classroom.id} + ')'">Update</a>
                   <button class="btn btn-danger btn-sm" th:data-id="${classroom.id}" th:data-name="${classroom.name}" onclick="openDeleteModal(this)">Delete</button>
                   <button class="btn btn-info btn-sm" th:onclick="'openSetMeetingModal(' + ${classroom.id} + ')'">Set Meeting</button>
@@ -235,6 +235,102 @@
   </div>
 </div>
 
+<!-- View Details Modal -->
+<div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-labelledby="viewDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewDetailsModalLabel">Classroom Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="classroomDetailsContainer">
+          <table class="table table-bordered">
+            <tbody>
+            <tr>
+              <th colspan="2">Classroom Details</th>
+            </tr>
+            <tr>
+              <td>ID</td>
+              <td id="classroomId2"></td>
+            </tr>
+            <tr>
+              <td>Name</td>
+              <td id="classroomName"></td>
+            </tr>
+            <tr>
+              <td>Description</td>
+              <td id="classroomDescription"></td>
+            </tr>
+            <tr>
+              <td>Classroom URL</td>
+              <td id="classroomUrl"></td>
+            </tr>
+            <tr>
+              <td>Image URL</td>
+              <td id="classroomImageUrl"></td>
+            </tr>
+            <tr>
+              <td>Is Active</td>
+              <td id="classroomIsActive"></td>
+            </tr>
+            <tr>
+              <th colspan="2">Creator Details</th>
+            </tr>
+            <tr>
+              <td>Creator ID</td>
+              <td id="creatorId"></td>
+            </tr>
+            <tr>
+              <td>First Name</td>
+              <td id="creatorFirstName"></td>
+            </tr>
+            <tr>
+              <td>Last Name</td>
+              <td id="creatorLastName"></td>
+            </tr>
+            <tr>
+              <td>Email</td>
+              <td id="creatorEmail"></td>
+            </tr>
+            <tr>
+              <td>Username</td>
+              <td id="creatorUsername"></td>
+            </tr>
+            <tr>
+              <th colspan="2">Teachers</th>
+            </tr>
+            <tr>
+              <td colspan="2" id="teachersList"></td>
+            </tr>
+            <tr>
+              <th colspan="2">Students</th>
+            </tr>
+            <tr>
+              <td colspan="2" id="studentsList"></td>
+            </tr>
+            <tr>
+              <th colspan="2">Meeting Dates</th>
+            </tr>
+            <tr>
+              <td colspan="2" id="meetingDatesList"></td>
+            </tr>
+            <tr>
+              <th colspan="2">Extra Teachers</th>
+            </tr>
+            <tr>
+              <td colspan="2" id="extraTeachersList"></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <footer th:replace="~{components/footer :: footer}"></footer>
 

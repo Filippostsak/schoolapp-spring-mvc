@@ -1,5 +1,6 @@
 package gr.aueb.cf.schoolappspringbootmvc.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -38,6 +39,7 @@ public class MeetingDate extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classroom_id", referencedColumnName = "id")
+    @JsonBackReference
     private Classroom classroom;
 
     @Override
