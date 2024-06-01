@@ -9,12 +9,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collection;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class MeetingUpdateDTO {
+public class UpdateMeetingDateDTO {
 
     private Long id;
 
@@ -26,11 +27,13 @@ public class MeetingUpdateDTO {
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime time;
 
-    @NotNull(message = "End time cannot be null")
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
-    @NotNull(message = "End date cannot be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
+
+    public Collection<Object> getMeetingDate() {
+        return null;
+    }
 }

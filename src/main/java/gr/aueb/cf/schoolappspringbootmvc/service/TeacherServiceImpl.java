@@ -1,5 +1,6 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
+import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.GetTeachersIdDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.RegisterTeacherDTO;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.Mapper;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
@@ -181,6 +182,27 @@ public class TeacherServiceImpl implements ITeacherService {
         }
     }
 
+    @Override
+    public Optional<GetTeachersIdDTO> findById(Long id) throws Exception {
+        //get current authenticated teacher id
+        log.info("Searching for teacher with id: {}", id);
+        //return id, firstname, lastname
+        try {
+            Optional<Teacher> teacherOptional = teacherRepository.findById(id);
+            if (teacherOptional.isPresent()) {
+                log.info("Teacher found with id: {}", id);
+                GetTeachersIdDTO getTeachersIdDTO = Mapper.extractGetTeachersIdDTOFromTeacher(teacherOptional.get());
+                return Optional.of(getTeachersIdDTO);
+            } else {
+                log.warn("No teacher found with id: {}", id);
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            log.error("Error searching for teacher with id: {}", id, e);
+            throw new Exception("Error searching for teacher", e);
+        }
+    }
+
     private String getCurrentUsername() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
@@ -189,5 +211,7 @@ public class TeacherServiceImpl implements ITeacherService {
             return principal.toString();
         }
     }
+
+
 
 }

@@ -1,10 +1,15 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
+import gr.aueb.cf.schoolappspringbootmvc.dto.ClassroomReadOnlyDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.ClassroomFindMeetingsDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.ClassroomUpdateDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.CreateClassroomDTO;
-import gr.aueb.cf.schoolappspringbootmvc.dto.meetingDate.MeetingUpdateDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.meetingDate.FindMeetingMeetingDateDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.meetingDate.UpdateMeetingDateDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.student.RemoveStudentDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.AddTeacherToClassroomDTO;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.ClassroomMapper;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.MeetingDateMapper;
 import gr.aueb.cf.schoolappspringbootmvc.model.Classroom;
 import gr.aueb.cf.schoolappspringbootmvc.model.MeetingDate;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
@@ -23,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -35,6 +41,7 @@ public class ClassroomServiceImpl implements IClassroomService {
     private final MeetingDateRepository meetingDateRepository;
     private final ClassroomMapper classroomMapper;
     private final ITeacherService teacherService;
+    private final MeetingDateMapper meetingDateMapper;
 
     @Override
     @Transactional
@@ -179,6 +186,7 @@ public class ClassroomServiceImpl implements IClassroomService {
     }
 
     @Override
+    @Transactional
     public void addTeacherToClassroom(Long classroomId, String teacherUsername) {
         try {
             Classroom classroom = classroomRepository.findById(classroomId)
@@ -213,6 +221,7 @@ public class ClassroomServiceImpl implements IClassroomService {
     }
 
     @Override
+    @Transactional
     public void addTeacherToClassroom(AddTeacherToClassroomDTO dto) {
         try {
             Classroom classroom = classroomRepository.findById(dto.getClassroomId())
@@ -223,7 +232,7 @@ public class ClassroomServiceImpl implements IClassroomService {
 
             classroom.addExtraTeacher(teacher); // Use addExtraTeacher method to add to extra_classroom_teachers table
             classroomRepository.save(classroom);
-            log.info("Teacher {} added to classroom ID: {}", dto.getTeacherUsername(), dto.getClassroomId());
+            log.info("Teacher {} added to this classroom ID: {}", dto.getTeacherUsername(), dto.getClassroomId());
         } catch (Exception e) {
             log.error("Error adding teacher {} to classroom ID: {}", dto.getTeacherUsername(), dto.getClassroomId(), e);
             throw new RuntimeException("Error adding teacher to classroom", e);
@@ -232,7 +241,8 @@ public class ClassroomServiceImpl implements IClassroomService {
 
 
     @Override
-    public void save(Classroom classroom) throws ClassroomAlreadyExistsException {
+    @Transactional
+    public void save(Classroom classroom) {
         try {
             if (classroomRepository.existsByName(classroom.getName())) {
                 throw new ClassroomAlreadyExistsException("Classroom with name " + classroom.getName() + " already exists");
@@ -264,27 +274,7 @@ public class ClassroomServiceImpl implements IClassroomService {
 
     @Override
     @Transactional
-    public void removeStudentFromClassroom(Long classroomId, Long studentId) {
-        Teacher currentTeacher = teacherService.getCurrentAuthenticatedTeacher()
-                .orElseThrow(() -> new RuntimeException("Authenticated teacher not found"));
-
-        Classroom classroom = classroomRepository.findById(classroomId)
-                .orElseThrow(() -> new RuntimeException("Classroom not found"));
-
-        if (!classroom.getCreator().equals(currentTeacher)) {
-            throw new RuntimeException("Teacher not authorized to remove students from this classroom");
-        }
-
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
-        classroom.removeStudent(student);
-        studentRepository.save(student); // Persist changes
-    }
-
-    @Override
-    @Transactional
-    public MeetingDate updateMeetingDate(Long classroomId, Long meetingDateId, MeetingUpdateDTO meetingUpdateDTO) {
+    public MeetingDate updateMeetingDate(Long classroomId, Long meetingDateId, UpdateMeetingDateDTO meetingUpdateDTO) {
         Teacher currentTeacher = teacherService.getCurrentAuthenticatedTeacher()
                 .orElseThrow(() -> new RuntimeException("Authenticated teacher not found"));
 
@@ -298,8 +288,95 @@ public class ClassroomServiceImpl implements IClassroomService {
         MeetingDate meetingDate = meetingDateRepository.findById(meetingDateId)
                 .orElseThrow(() -> new RuntimeException("Meeting date not found"));
 
-        classroomMapper.updateMeetingDateFromDTO(meetingUpdateDTO, meetingDate);
+        meetingDateMapper.updateMeetingDateFromDTO(meetingUpdateDTO, meetingDate);
 
         return meetingDateRepository.save(meetingDate);
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ClassroomFindMeetingsDTO> getAllClassroomsAndMeetingsForCurrentTeacher() {
+        Teacher currentTeacher = teacherService.getCurrentAuthenticatedTeacher()
+                .orElseThrow(() -> new RuntimeException("Authenticated teacher not found"));
+
+        List<Classroom> classrooms = classroomRepository.findByCreatorOrTeachersContaining(currentTeacher, currentTeacher);
+
+        return classrooms.stream().map(classroom -> {
+            ClassroomFindMeetingsDTO classroomDTO = classroomMapper.toClassroomFindMeetingsDTO(classroom);
+            List<FindMeetingMeetingDateDTO> meetingDates = meetingDateRepository.findByClassroom(classroom).stream()
+                    .map(meetingDateMapper::toMeetingDateFindMeetingsDTO)
+                    .collect(Collectors.toList());
+            classroomDTO.setMeetingDates(meetingDates);
+            return classroomDTO;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void removeStudentFromClassroom(RemoveStudentDTO dto) {
+        try{
+            Classroom classroom = classroomRepository.findById(dto.getClassroomId())
+                    .orElseThrow(() -> new RuntimeException("Classroom not found"));
+
+            Student student = studentRepository.findById(dto.getStudentId())
+                    .orElseThrow(() -> new RuntimeException("Student not found"));
+
+            classroom.removeStudent(student);
+            classroomRepository.save(classroom);
+            log.info("Student {} removed from classroom ID: {}", student.getId(), classroom.getId());
+
+        }catch (Exception e){
+            log.error("Error removing student from classroom", e);
+            throw new RuntimeException("Error removing student from classroom", e);
+        }
+    }
+
+    @Override
+    public boolean isStudentInClassroom(Long classroomId, Long studentId) {
+        try{
+            return classroomRepository.existsByIdAndStudentsOfClassroom_Id(classroomId, studentId);
+        }catch (Exception e){
+            log.error("Error checking if student is in classroom", e);
+            throw new RuntimeException("Error checking if student is in classroom", e);
+        }
+    }
+
+    @Override
+    public void addStudentToClassroom(Long classroomId, Long studentId) {
+        if (isStudentInClassroom(classroomId, studentId)) {
+            throw new RuntimeException("Student is already in classroom");
+        }
+        try{
+            Classroom classroom = classroomRepository.findById(classroomId)
+                    .orElseThrow(() -> new RuntimeException("Classroom not found"));
+
+            Student student = studentRepository.findById(studentId)
+                    .orElseThrow(() -> new RuntimeException("Student not found"));
+
+            classroom.addStudent(student);
+            classroomRepository.save(classroom);
+            log.info("Student {} added to classroom ID: {}", student.getId(), classroom.getId());
+
+        }catch (Exception e){
+            log.error("Error adding student to classroom", e);
+            throw new RuntimeException("Error adding student to classroom", e);
+        }
+    }
+
+    @Override
+    public ClassroomReadOnlyDTO getByClassroomId(Long id) throws Exception {
+        try{
+            if (!classroomRepository.existsById(id)) {
+                throw new RuntimeException("Classroom not found");
+            }
+            Classroom classroom = classroomRepository.findById(id).orElseThrow(() ->
+                    new RuntimeException("Classroom not found"));
+            log.info("Classroom retrieved successfully with ID: {}", id);
+            return classroomMapper.toReadOnlyDTO(classroom);
+        }catch (Exception e){
+            log.error("Error retrieving classroom with ID: {}", id, e);
+            throw new Exception("Error retrieving classroom", e);
+        }
     }
 }

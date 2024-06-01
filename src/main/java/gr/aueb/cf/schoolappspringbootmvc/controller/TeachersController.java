@@ -56,31 +56,11 @@ public class TeachersController {
             model.addAttribute("firstname", teacher.getFirstname());
         }
 
-        List<Student> students;
-        if (lastname == null || lastname.isEmpty()) {
-            try {
-                students = studentService.findAllStudents();
-            } catch (Exception e) {
-                model.addAttribute("error", "An error occurred while retrieving students.");
-                return "teachers/search-students";
-            }
-        } else {
-            students = studentService.searchStudentsByLastname(lastname);
-        }
-
-        if (limit != null && limit > 0 && limit < students.size()) {
-            students = students.subList(0, limit);
-        }
-
-        if (students.isEmpty()) {
-            model.addAttribute("error", "No students found with the provided last name.");
-        } else {
-            model.addAttribute("students", students);
-        }
-
-        model.addAttribute("searchPerformed", true);
+        model.addAttribute("searchPerformed", false);
         return "teachers/search-students";
     }
+
+
 
     @GetMapping("/create-classroom")
     public String createClassroom(Model model) {

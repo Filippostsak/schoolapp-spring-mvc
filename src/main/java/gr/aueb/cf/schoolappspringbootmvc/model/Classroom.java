@@ -1,5 +1,7 @@
 package gr.aueb.cf.schoolappspringbootmvc.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +38,7 @@ public class Classroom extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", referencedColumnName = "id")
+    @JsonBackReference
     private Teacher creator;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -44,12 +47,20 @@ public class Classroom extends AbstractEntity {
             joinColumns = @JoinColumn(name = "classroom_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "teacher_id", referencedColumnName = "id")
     )
+    @JsonManagedReference
     private List<Teacher> teachers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "classroom_students",
+            joinColumns = @JoinColumn(name = "classroom_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "student_id", referencedColumnName = "id")
+    )
+    @JsonManagedReference
     private List<Student> studentsOfClassroom = new ArrayList<>();
 
     @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<MeetingDate> meetingDates = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -58,6 +69,7 @@ public class Classroom extends AbstractEntity {
             joinColumns = @JoinColumn(name = "classroom_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "teacher_id", referencedColumnName = "id")
     )
+    @JsonManagedReference
     private List<Teacher> extraTeachers = new ArrayList<>();
 
     public void addTeacher(Teacher teacher) {
@@ -88,18 +100,14 @@ public class Classroom extends AbstractEntity {
         }
     }
 
-    public List<Student> getStudentsOfClassroom() {
-        return studentsOfClassroom;
-    }
-
     public void addStudent(Student student) {
         studentsOfClassroom.add(student);
-        student.setClassroom(this);
+        student.getClassrooms().add(this);
     }
 
     public void removeStudent(Student student) {
         studentsOfClassroom.remove(student);
-        student.setClassroom(null);
+        student.getClassrooms().remove(this);
     }
 
     public void addMeetingDate(MeetingDate meetingDate) {
@@ -110,5 +118,9 @@ public class Classroom extends AbstractEntity {
     public void removeMeetingDate(MeetingDate meetingDate) {
         meetingDates.remove(meetingDate);
         meetingDate.setClassroom(null);
+    }
+
+    public List<Student> getStudents(){
+        return studentsOfClassroom;
     }
 }

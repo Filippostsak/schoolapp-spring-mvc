@@ -1,5 +1,6 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
+import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.GetTeachersIdDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.RegisterTeacherDTO;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
@@ -67,4 +68,6 @@ public interface ITeacherService {
      */
 
     List<Teacher> findByUsernameContaining(String username) throws Exception;
+
+    Optional<GetTeachersIdDTO> findById(Long id) throws Exception;
 }

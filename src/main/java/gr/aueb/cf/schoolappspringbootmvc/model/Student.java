@@ -1,7 +1,12 @@
 package gr.aueb.cf.schoolappspringbootmvc.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a student in the application with fields for first name, last name,
@@ -24,13 +29,18 @@ public class Student extends AbstractEntity {
 
     private String lastname;
 
-    @ManyToOne
-    @JoinColumn(name = "classroom_id", referencedColumnName = "id")
-    private Classroom classroom;
+    @ManyToMany(mappedBy = "studentsOfClassroom")
+    @JsonBackReference
+    private List<Classroom> classrooms = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonBackReference
     private User user;
+
+    @ManyToMany(mappedBy = "students")
+    @JsonManagedReference
+    private List<Teacher> teachers = new ArrayList<>();
 
     /**
      * Constructs a new {@link Student} instance with the specified first name and last name.
@@ -60,7 +70,7 @@ public class Student extends AbstractEntity {
      * @param classroom the classroom to set
      */
     public void setClassroom(Classroom classroom) {
-        this.classroom = classroom;
+        this.classrooms.add(classroom);
         if (classroom != null && !classroom.getStudentsOfClassroom().contains(this)) {
             classroom.getStudentsOfClassroom().add(this);
         }
@@ -78,7 +88,6 @@ public class Student extends AbstractEntity {
                 ", firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", user=" + user +
-                ", classroom=" + classroom +
                 '}';
     }
 }

@@ -65,5 +65,20 @@ h1 {
 }
 .content-container {
     position: relative;
-    height: 200px; /* Adjust height as needed */
+    height: 300px;
+    overflow: auto;
+    padding-bottom: 50px;
+}
+.table-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.table-striped tbody tr {
+    background: white;
+    border-bottom: 10px solid #f9f9f9;
+}
+.table th, .table td {
+    vertical-align: middle;
 }

@@ -8,12 +8,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class AddTeacherToClassroomDTO {
+@AllArgsConstructor
+public class GetTeachersIdDTO {
+
+    private Long id;
 
     @NotNull
-    private Long classroomId;
+    private String firstname;
     @NotNull
-    private String teacherUsername;
+    private String lastname;
 }

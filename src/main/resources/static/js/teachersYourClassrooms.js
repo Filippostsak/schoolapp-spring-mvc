@@ -304,6 +304,46 @@ function setMeeting() {
         });
 }
 
+// Function to view classroom details
+function viewClassroomDetails(classroomId) {
+    fetch(`/teachers/classroom-read-only/${classroomId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('classroomId2').innerText = data.id;
+            document.getElementById('classroomName').innerText = data.name;
+            document.getElementById('classroomDescription').innerText = data.description;
+            document.getElementById('classroomUrl').innerText = data.classroomUrl;
+            document.getElementById('classroomImageUrl').innerText = data.imageUrl;
+            document.getElementById('classroomIsActive').innerText = data.isActive ? 'Yes' : 'No';
+
+            document.getElementById('creatorId').innerText = data.creator.id;
+            document.getElementById('creatorFirstName').innerText = data.creator.firstname;
+            document.getElementById('creatorLastName').innerText = data.creator.lastname;
+            document.getElementById('creatorEmail').innerText = data.creator.email;
+            document.getElementById('creatorUsername').innerText = data.creator.username;
+
+            document.getElementById('teachersList').innerHTML = data.teachers.map(teacher => `
+                    <p>ID: ${teacher.id}, Name: ${teacher.firstname} ${teacher.lastname}, Email: ${teacher.email}, Username: ${teacher.username}</p>
+                `).join('');
+
+            document.getElementById('studentsList').innerHTML = data.studentsOfClassroom.map(student => `
+                    <p>ID: ${student.id}, Name: ${student.firstname} ${student.lastname}, Email: ${student.email}, Country: ${student.country}, City: ${student.city}</p>
+                `).join('');
+
+            document.getElementById('meetingDatesList').innerHTML = data.meetingDates.map(meeting => `
+                    <p>ID: ${meeting.id}, Date: ${meeting.date}, Time: ${meeting.time}, End Date: ${meeting.endDate}, End Time: ${meeting.endTime}</p>
+                `).join('');
+
+            document.getElementById('extraTeachersList').innerHTML = data.extraTeachers.map(teacher => `
+                    <p>ID: ${teacher.id}, Name: ${teacher.firstname} ${teacher.lastname}, Email: ${teacher.email}, Username: ${teacher.username}</p>
+                `).join('');
+
+            const viewDetailsModal = new bootstrap.Modal(document.getElementById('viewDetailsModal'));
+            viewDetailsModal.show();
+        })
+        .catch(error => console.error('Error fetching classroom details:', error));
+}
+
 // Function to open the Remove Student Modal
 function openRemoveStudentModal(classroomId, studentId) {
     console.log("Opening remove student modal for classroom ID:", classroomId, "and student ID:", studentId);
@@ -324,7 +364,7 @@ function removeStudent() {
 
     showSpinnerAndHideButtons(spinnerId, infoId, buttonContainer);
 
-    fetch(`/api/classrooms/${classroomId}/remove-student/${studentId}`, {
+    fetch(`/teachers/${classroomId}/remove-student/${studentId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'

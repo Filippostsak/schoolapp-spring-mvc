@@ -1,5 +1,7 @@
 package gr.aueb.cf.schoolappspringbootmvc.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.ArrayList;
@@ -27,13 +29,25 @@ public class Teacher extends AbstractEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonBackReference
     private User user;
 
     @ManyToMany(mappedBy = "teachers")
+    @JsonBackReference
     private List<Classroom> classrooms = new ArrayList<>();
 
     @ManyToMany(mappedBy = "extraTeachers")
+    @JsonBackReference
     private List<Classroom> extraClassrooms = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "teacher_students",
+            joinColumns = @JoinColumn(name = "teacher_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "student_id", referencedColumnName = "id")
+    )
+    @JsonManagedReference
+    private List<Student> students = new ArrayList<>();
 
     /**
      * Constructs a new {@link Teacher} instance with the specified first name and last name.
