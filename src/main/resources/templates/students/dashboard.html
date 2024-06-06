@@ -1,14 +1,104 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>students-dashboard</title>
+    <title>Student's Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/styles/studentsDashboard.css}">
+    <link rel="stylesheet" th:href="@{/styles/navbar.css}">
+    <link rel="stylesheet" th:href="@{/styles/footer.css}">
 </head>
 <body>
-<nav th:replace="components/navbar :: navbar"></nav>
-<h1>This is the students dashboard!</h1>
+<nav th:replace="~{components/navbar :: navbar}"></nav>
+<div class="container mt-5 mb-5">
+    <h1 class="display-3 text-center mb-4">Student's Dashboard</h1>
+    <h4 class="display-5 text-center mb-4">Welcome, <span th:text="${username}">Student</span></h4>
+    <div class="row mt-5 mb-5">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'view-classrooms')">View Classrooms and meetings</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'view-messages')">Send a message to your teacher!</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'view-teacher-messages')">View Messages from Teachers</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'view-notifications')">View Notifications <span id="notification-count" class="badge bg-danger ms-2">0</span></a>
+            </div>
+        </div>
+        <div class="col-md-9 content-container">
+            <div id="default-section" class="content-section active">
+                <h2>Welcome to the Student's Dashboard</h2>
+                <p>Please select an option from the menu to get started.</p>
+            </div>
+            <div id="view-classrooms" class="content-section" style="display: none;">
+                <h2>View Your Classrooms</h2>
+                <p class="text-info mt-3 shadow-sm p-3 rounded bg-light">
+                    Use this section to view all the classrooms you are enrolled in. You can see classroom details and related information.
+                </p>
+                <a th:href="@{/students/classrooms}" class="btn btn-primary mt-3" onclick="showSpinner(event, this)">View Classrooms</a>
+                <div class="spinner-border text-primary mt-3" role="status" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div id="view-messages" class="content-section" style="display: none;">
+                <h2>Send a message to your tutor</h2>
+                <div id="usernames-container" class="mt-3">
+                    <label for="usernames-select">Select the receiver</label>
+                    <select id="usernames-select" class="form-select mb-3"></select>
+                    <label for="message-content">Write your message</label>
+                    <textarea id="message-content" class="form-control mb-3" placeholder="Enter your message"></textarea>
+                    <button id="sendMessageButton" class="btn btn-primary" onclick="createMessageToSelectedUser()">Send Message</button>
+                    <div class="spinner-border text-primary mt-3" id="messageSpinner" role="status" style="display: none;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="messages-container" class="mt-4"></div>
+            </div>
+            <div id="view-teacher-messages" class="content-section" style="display: none;">
+                <h2>View Messages from Teachers</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#viewMessagesModal">View Messages</button>
+            </div>
+            <div id="view-notifications" class="content-section" style="display: none;">
+                <h2>View Notifications</h2>
+                <div id="notifications-list" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="successAlert" class="alert alert-success mt-3" role="alert" style="display: none;">
+    The message sent successfully!
+</div>
+<div id="errorAlert" class="alert alert-danger mt-3" role="alert" style="display: none;">
+    An error occurred while processing your request. The length of the message must be more than 1 character and below 500. Please try again.
+</div>
+
+<!-- Modal for Viewing Messages from Notifications -->
+<div class="modal fade text-black" id="viewMessagesModal" tabindex="-1" aria-labelledby="viewMessagesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewMessagesModalLabel">Message Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="messages-container-view">
+                    <!-- Message details will be dynamically inserted here by JavaScript -->
+                </div>
+                <div id="reply-form-container">
+                    <!-- Reply form will be dynamically inserted here by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<footer th:replace="~{components/footer :: footer}"></footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<footer th:replace="components/footer :: footer"></footer>
+<script th:src="@{/js/studentsDashboard.js}"></script>
+<script th:src="@{/js/studentsNotifications.js}"></script>
+<script th:src="@{/js/studentMessages.js}"></script>
 </body>
 </html>

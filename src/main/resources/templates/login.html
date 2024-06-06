@@ -19,7 +19,7 @@
     </div>
     <div class="form-container">
         <h1 class="mb-4 text-center">Login</h1>
-        <form th:action="@{/login}" method="post" class="needs-validation" novalidate onsubmit="showSpinner()">
+        <form th:action="@{/login}" method="post" class="needs-validation" novalidate>
             <!-- Username -->
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
@@ -39,12 +39,13 @@
             </div>
 
             <!-- Error Message -->
-            <div id="errorAlert" class="alert alert-danger mt-2" style="display: none;">Invalid username or password</div>
-
+            <div class="alert alert-danger mt-2" th:if="${param.error}" th:text="${errorMessage}" style="display: block;"></div>
+            <!-- Success Message -->
+            <div class="alert alert-success mt-2" th:if="${success}" style="display: block;">Login successful! Redirecting...</div>
 
             <!-- Submit Button and Spinner -->
             <div class="d-flex justify-content-center align-items-center">
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <button type="submit" class="btn btn-primary w-100" id="submitButton">Login</button>
                 <div class="spinner-border text-primary ms-3" role="status" id="loadingSpinner" style="display: none;">
                     <span class="visually-hidden">Loading...</span>
                 </div>

@@ -1,24 +1,19 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
-import gr.aueb.cf.schoolappspringbootmvc.dto.ClassroomReadOnlyDTO;
-import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.ClassroomFindMeetingsDTO;
-import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.ClassroomUpdateDTO;
-import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.CreateClassroomDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.*;
 import gr.aueb.cf.schoolappspringbootmvc.dto.meetingDate.FindMeetingMeetingDateDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.meetingDate.UpdateMeetingDateDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.student.RemoveStudentDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.AddTeacherToClassroomDTO;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.ClassroomMapper;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.MeetingDateMapper;
-import gr.aueb.cf.schoolappspringbootmvc.model.Classroom;
-import gr.aueb.cf.schoolappspringbootmvc.model.MeetingDate;
-import gr.aueb.cf.schoolappspringbootmvc.model.Student;
-import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
+import gr.aueb.cf.schoolappspringbootmvc.model.*;
 import gr.aueb.cf.schoolappspringbootmvc.repository.ClassroomRepository;
 import gr.aueb.cf.schoolappspringbootmvc.repository.MeetingDateRepository;
 import gr.aueb.cf.schoolappspringbootmvc.repository.StudentRepository;
 import gr.aueb.cf.schoolappspringbootmvc.repository.TeacherRepository;
 import gr.aueb.cf.schoolappspringbootmvc.service.exceptions.ClassroomAlreadyExistsException;
+import gr.aueb.cf.schoolappspringbootmvc.service.exceptions.StudentNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,18 +25,50 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of the {@link IClassroomService} interface.
+ * Provides methods for managing classrooms.
+ */
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ClassroomServiceImpl implements IClassroomService {
 
+    // The classroom repository
+
     private final ClassroomRepository classroomRepository;
+
+    // The teacher repository
+
     private final TeacherRepository teacherRepository;
+
+    // The student repository
+
     private final StudentRepository studentRepository;
+
+    // The meeting date repository
+
     private final MeetingDateRepository meetingDateRepository;
+
+    // The classroom mapper
+
     private final ClassroomMapper classroomMapper;
+
+    // The teacher service
+
     private final ITeacherService teacherService;
+
+    // The meeting date mapper
+
     private final MeetingDateMapper meetingDateMapper;
+
+
+    /**
+     * Creates a classroom.
+     * @param classroomDTO the data for creating the classroom.
+     * @return the created classroom.
+     */
 
     @Override
     @Transactional
@@ -69,6 +96,11 @@ public class ClassroomServiceImpl implements IClassroomService {
         }
     }
 
+    /**
+     * Retrieves the teacher who created the classroom.
+     * @param classroomId the id of the classroom.
+     * @return the teacher who created the classroom.
+     */
 
     @Override
     @Transactional(readOnly = true)
@@ -83,6 +115,12 @@ public class ClassroomServiceImpl implements IClassroomService {
         }
     }
 
+    /**
+     * Retrieves the students in the classroom.
+     * @param classroomId the id of the classroom.
+     * @return a list of students in the classroom.
+     */
+
     @Override
     @Transactional(readOnly = true)
     public List<Student> getStudentsInClassroom(Long classroomId) {
@@ -95,6 +133,12 @@ public class ClassroomServiceImpl implements IClassroomService {
             throw new RuntimeException("Error retrieving students", e);
         }
     }
+
+    /**
+     * Retrieves the teacher of the classroom.
+     * @param teacherId the id of the classroom.
+     * @return the teacher of the classroom.
+     */
 
     @Override
     @Transactional(readOnly = true)
@@ -109,6 +153,11 @@ public class ClassroomServiceImpl implements IClassroomService {
         }
     }
 
+    /**
+     * Retrieves all classrooms.
+     * @return a list of all classrooms.
+     */
+
     @Override
     @Transactional(readOnly = true)
     public List<Classroom> findAllClassrooms() {
@@ -119,6 +168,13 @@ public class ClassroomServiceImpl implements IClassroomService {
             throw new RuntimeException("Error retrieving all classrooms", e);
         }
     }
+
+    /**
+     * Updates a classroom.
+     * @param classroomId the id of the classroom.
+     * @param classroomDTO the data for updating the classroom.
+     * @return the updated classroom.
+     */
 
     @Override
     @Transactional
@@ -140,6 +196,11 @@ public class ClassroomServiceImpl implements IClassroomService {
             throw new RuntimeException("Error updating classroom", e);
         }
     }
+
+    /**
+     * Deletes a classroom.
+     * @param classroomId the id of the classroom to delete.
+     */
 
     @Override
     @Transactional
@@ -175,6 +236,11 @@ public class ClassroomServiceImpl implements IClassroomService {
         log.info("Classroom deleted successfully with ID: {}", classroomId);
     }
 
+    /**
+     * Checks if a classroom name exists.
+     * @param name the name of the classroom.
+     * @return true if the classroom name exists, otherwise false.
+     */
     @Override
     public boolean classroomNameExists(String name) {
         try{
@@ -184,6 +250,12 @@ public class ClassroomServiceImpl implements IClassroomService {
             throw new RuntimeException("Error checking if classroom name exists", e);
         }
     }
+
+    /**
+     * Adds a teacher to a classroom.
+     * @param classroomId the id of the classroom.
+     * @param teacherUsername the username of the teacher.
+     */
 
     @Override
     @Transactional
@@ -204,11 +276,23 @@ public class ClassroomServiceImpl implements IClassroomService {
         }
     }
 
+    /**
+     * Retrieves classrooms by teacher.
+     * @param teacherId the id of the teacher.
+     * @param pageable the pageable object.
+     * @return a page of classrooms.
+     */
 
     @Override
     public Page<Classroom> findClassroomsByTeacher(Long teacherId, Pageable pageable) {
         return classroomRepository.findByTeachers_Id(teacherId, pageable);
     }
+
+    /**
+     * Retrieves a classroom by id.
+     * @param classroomId the id of the classroom.
+     * @return the classroom with the specified id.
+     */
 
     @Override
     public Optional<Classroom> findById(Long classroomId) throws Exception {
@@ -219,6 +303,11 @@ public class ClassroomServiceImpl implements IClassroomService {
             throw new Exception("Error retrieving classroom", e);
         }
     }
+
+    /**
+     * Adds a teacher to a classroom.
+     * @param dto the DTO containing the classroom and teacher information.
+     */
 
     @Override
     @Transactional
@@ -239,6 +328,10 @@ public class ClassroomServiceImpl implements IClassroomService {
         }
     }
 
+    /**
+     * Saves a classroom.
+     * @param classroom the classroom to save.
+     */
 
     @Override
     @Transactional
@@ -253,6 +346,19 @@ public class ClassroomServiceImpl implements IClassroomService {
             throw new RuntimeException("Error saving classroom", e);
         }
     }
+
+    /**
+     * Updates the details of a classroom.
+     * This method first retrieves the currently authenticated teacher and the classroom to be updated.
+     * It then checks if the authenticated teacher is the creator of the classroom.
+     * If not, it throws a RuntimeException.
+     * If the teacher is the creator, it updates the classroom details using the provided DTO and saves the updated classroom.
+     *
+     * @param classroomId The ID of the classroom to be updated.
+     * @param classroomUpdateDTO The DTO containing the new details of the classroom.
+     * @return The updated classroom.
+     * @throws RuntimeException if the authenticated teacher is not the creator of the classroom or if the classroom or teacher could not be found.
+     */
 
     @Override
     @Transactional
@@ -271,6 +377,20 @@ public class ClassroomServiceImpl implements IClassroomService {
 
         return classroomRepository.save(classroom);
     }
+
+    /**
+     * Updates the meeting date of a classroom.
+     * This method first retrieves the currently authenticated teacher and the classroom for which the meeting date is to be updated.
+     * It then checks if the authenticated teacher is the creator of the classroom.
+     * If not, it throws a RuntimeException.
+     * If the teacher is the creator, it retrieves the meeting date to be updated, updates the meeting date details using the provided DTO, and saves the updated meeting date.
+     *
+     * @param classroomId The ID of the classroom for which the meeting date is to be updated.
+     * @param meetingDateId The ID of the meeting date to be updated.
+     * @param meetingUpdateDTO The DTO containing the new details of the meeting date.
+     * @return The updated meeting date.
+     * @throws RuntimeException if the authenticated teacher is not the creator of the classroom, or if the classroom, teacher, or meeting date could not be found.
+     */
 
     @Override
     @Transactional
@@ -293,6 +413,16 @@ public class ClassroomServiceImpl implements IClassroomService {
         return meetingDateRepository.save(meetingDate);
     }
 
+    /**
+     * Retrieves all classrooms and meetings for the currently authenticated teacher.
+     * This method first retrieves the currently authenticated teacher.
+     * It then retrieves all classrooms where the teacher is the creator or a teacher of the classroom.
+     * For each classroom, it retrieves all meeting dates associated with the classroom.
+     * It then maps each classroom and its meeting dates to a ClassroomFindMeetingsDTO object and returns a list of these objects.
+     *
+     * @return a list of ClassroomFindMeetingsDTO objects containing all classrooms and their meeting dates for the currently authenticated teacher.
+     * @throws RuntimeException if the authenticated teacher could not be found.
+     */
 
     @Override
     @Transactional(readOnly = true)
@@ -311,6 +441,16 @@ public class ClassroomServiceImpl implements IClassroomService {
             return classroomDTO;
         }).collect(Collectors.toList());
     }
+
+    /**
+     * Removes a student from a classroom.
+     * This method first retrieves the classroom and the student to be removed using the provided DTO.
+     * It then removes the student from the classroom and saves the updated classroom.
+     * If the classroom or student could not be found, or if an error occurs during the removal process, a RuntimeException is thrown.
+     *
+     * @param dto The DTO containing the IDs of the classroom and the student to be removed.
+     * @throws RuntimeException if the classroom or student could not be found, or if an error occurs during the removal process.
+     */
 
     @Override
     @Transactional
@@ -332,6 +472,13 @@ public class ClassroomServiceImpl implements IClassroomService {
         }
     }
 
+
+    /**
+     * Checks if a student is in a classroom.
+     * @param classroomId the name of the classroom.
+     * @param studentId the id of the student.
+     * @return true if the student is in the classroom, otherwise false.
+     */
     @Override
     public boolean isStudentInClassroom(Long classroomId, Long studentId) {
         try{
@@ -341,6 +488,12 @@ public class ClassroomServiceImpl implements IClassroomService {
             throw new RuntimeException("Error checking if student is in classroom", e);
         }
     }
+
+    /**
+     * Adds a student to a classroom.
+     * @param classroomId the name of the classroom.
+     * @param studentId the id of the student.
+     */
 
     @Override
     public void addStudentToClassroom(Long classroomId, Long studentId) {
@@ -364,6 +517,14 @@ public class ClassroomServiceImpl implements IClassroomService {
         }
     }
 
+
+    /**
+     * Retrieves a classroom by its name.
+     * @param id the name of the classroom.
+     * @return the classroom with the specified name.
+     * @throws Exception if an error occurs while retrieving the classroom.
+     */
+
     @Override
     public ClassroomReadOnlyDTO getByClassroomId(Long id) throws Exception {
         try{
@@ -373,10 +534,51 @@ public class ClassroomServiceImpl implements IClassroomService {
             Classroom classroom = classroomRepository.findById(id).orElseThrow(() ->
                     new RuntimeException("Classroom not found"));
             log.info("Classroom retrieved successfully with ID: {}", id);
-            return classroomMapper.toReadOnlyDTO(classroom);
+            return ClassroomMapper.toReadOnlyDTO(classroom);
         }catch (Exception e){
             log.error("Error retrieving classroom with ID: {}", id, e);
             throw new Exception("Error retrieving classroom", e);
         }
     }
+
+    @Override
+    public List<ClassroomStudentsClassroomDTO> findClassroomsByStudentId(Long studentId) {
+        try {
+            if (!studentRepository.existsById(studentId)) {
+                throw new StudentNotFoundException("Student not found with ID: " + studentId);
+            }
+            log.info("Retrieving classrooms by student ID: {}", studentId);
+            List<Classroom> classrooms = classroomRepository.findClassroomsByStudentsOfClassroom_Id(studentId);
+            log.info("Classrooms retrieved successfully by student ID: {}", studentId);
+            if (classrooms.isEmpty()) {
+                throw new RuntimeException("No classrooms found for student ID: " + studentId);
+            }
+            log.info("Classrooms found for student ID: {}", studentId);
+            return ClassroomMapper.toClassroomStudentsClassroomDTOList(classrooms);
+        } catch (StudentNotFoundException e) {
+            log.error("Student not found: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving classrooms by student ID: {}", studentId, e);
+            throw new RuntimeException("Error retrieving classrooms by student ID", e);
+        }
+    }
+
+    @Override
+    public List<Classroom> getAllClassroomsByTeacherId(Long teacherId) {
+        try{
+            if (!teacherRepository.existsById(teacherId)) {
+                throw new RuntimeException("Teacher not found with ID: " + teacherId);
+            }
+            Teacher teacher = teacherRepository.findById(teacherId)
+                    .orElseThrow(() -> new RuntimeException("Teacher not found"));
+            return teacher.getClassrooms();
+        }
+        catch (Exception e){
+            log.error("Error retrieving classrooms by teacher ID: {}", teacherId, e);
+            throw new RuntimeException("Error retrieving classrooms by teacher ID", e);
+        }
+    }
+
+
 }

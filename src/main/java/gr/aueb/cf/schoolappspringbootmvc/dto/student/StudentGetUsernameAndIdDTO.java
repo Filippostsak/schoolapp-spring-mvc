@@ -1,0 +1,30 @@
+package gr.aueb.cf.schoolappspringbootmvc.dto.student;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * Data Transfer Object for getting the student's username and ID.
+ * Contains information about the student's ID and username.
+ */
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class StudentGetUsernameAndIdDTO {
+
+    /**
+     * The ID of the student.
+     */
+
+    private Long id;
+
+    /**
+     * The username of the student.
+     */
+
+    private String username;
+}

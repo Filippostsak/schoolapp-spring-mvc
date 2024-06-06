@@ -3,7 +3,6 @@ package gr.aueb.cf.schoolappspringbootmvc.controller;
 import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.CreateClassroomDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.student.SearchStudentDTO;
 import gr.aueb.cf.schoolappspringbootmvc.model.Classroom;
-import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
 import gr.aueb.cf.schoolappspringbootmvc.service.IClassroomService;
 import gr.aueb.cf.schoolappspringbootmvc.service.IStudentService;
@@ -23,16 +22,25 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controller for handling teacher-related actions such as dashboard viewing,
+ * student searching, classroom creation, and classroom management.
+ */
 @Controller
 @RequestMapping("/teachers")
 @RequiredArgsConstructor
 @Slf4j
 public class TeachersController {
 
-    private final IStudentService studentService;
     private final IClassroomService classroomService;
     private final TeacherServiceImpl teacherServiceImpl;
 
+    /**
+     * Displays the teacher's dashboard.
+     *
+     * @param model the model to be used in the view
+     * @return the name of the dashboard view
+     */
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         Optional<Teacher> currentTeacherOpt = teacherServiceImpl.getCurrentAuthenticatedTeacher();
@@ -46,6 +54,14 @@ public class TeachersController {
         return "teachers/dashboard";
     }
 
+    /**
+     * Displays the student search page.
+     *
+     * @param lastname the last name to search for
+     * @param limit    the limit on the number of results
+     * @param model    the model to be used in the view
+     * @return the name of the search students view
+     */
     @GetMapping("/search-students")
     public String searchStudents(@RequestParam(value = "lastname", required = false) String lastname,
                                  @RequestParam(value = "limit", required = false) Integer limit,
@@ -60,8 +76,12 @@ public class TeachersController {
         return "teachers/search-students";
     }
 
-
-
+    /**
+     * Displays the classroom creation page.
+     *
+     * @param model the model to be used in the view
+     * @return the name of the create classroom view
+     */
     @GetMapping("/create-classroom")
     public String createClassroom(Model model) {
         Optional<Teacher> currentTeacherOpt = teacherServiceImpl.getCurrentAuthenticatedTeacher();
@@ -73,6 +93,15 @@ public class TeachersController {
         return "teachers/create-classroom";
     }
 
+    /**
+     * Handles the submission of the classroom creation form.
+     *
+     * @param createClassroomDTO  the data transfer object for creating a classroom
+     * @param bindingResult       the binding result for validation errors
+     * @param model               the model to be used in the view
+     * @param redirectAttributes  the redirect attributes for flash messages
+     * @return the name of the view to be displayed
+     */
     @PostMapping("/create-classroom")
     public String createClassroom(@ModelAttribute("createClassroomDTO") @Valid CreateClassroomDTO createClassroomDTO,
                                   BindingResult bindingResult,
@@ -100,6 +129,13 @@ public class TeachersController {
         }
     }
 
+    /**
+     * Displays the teacher's classrooms.
+     *
+     * @param page  the current page number
+     * @param model the model to be used in the view
+     * @return the name of the view displaying the teacher's classrooms
+     */
     @GetMapping("/your-classrooms")
     public String yourClassrooms(@RequestParam(defaultValue = "1") int page, Model model) {
         int pageSize = 10;
@@ -120,7 +156,4 @@ public class TeachersController {
 
         return "teachers/your-classrooms";
     }
-
-
-
 }

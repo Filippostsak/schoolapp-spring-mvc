@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.validation.Valid;
 
+/**
+ * Controller responsible for handling user registration requests.
+ */
 @Controller
 @RequiredArgsConstructor
 public class RegisterController {
@@ -32,11 +35,22 @@ public class RegisterController {
     private final ITeacherService teacherService;
     private final IAdminService adminService;
 
+    /**
+     * Displays the registration page.
+     *
+     * @return the name of the registration view
+     */
     @GetMapping("/register")
     public String showRegisterPage() {
         return "register";
     }
 
+    /**
+     * Handles role selection and redirects to the appropriate registration form.
+     *
+     * @param role the selected role
+     * @return the redirection URL to the corresponding registration form
+     */
     @GetMapping("/register/role")
     public String handleRoleSelection(@RequestParam("role") String role) {
         logger.info("Selected role: {}", role);
@@ -52,12 +66,26 @@ public class RegisterController {
         }
     }
 
+    /**
+     * Displays the teacher registration form.
+     *
+     * @param model the model to hold form data
+     * @return the name of the teacher registration view
+     */
     @GetMapping("/register/teacher")
     public String showTeacherRegistrationForm(Model model) {
         model.addAttribute("teacher", new RegisterTeacherDTO());
         return "registerTeacher";
     }
 
+    /**
+     * Handles the submission of the teacher registration form.
+     *
+     * @param teacherDTO the teacher registration data
+     * @param bindingResult the result of the validation
+     * @param model the model to hold success or error messages
+     * @return the name of the view to be rendered
+     */
     @PostMapping("/register/teacher")
     public String registerTeacher(@Valid @ModelAttribute("teacher") RegisterTeacherDTO teacherDTO, BindingResult bindingResult, Model model) {
         logger.info("Received registration data: {}", teacherDTO);
@@ -76,14 +104,26 @@ public class RegisterController {
         }
     }
 
-
-
+    /**
+     * Displays the student registration form.
+     *
+     * @param model the model to hold form data
+     * @return the name of the student registration view
+     */
     @GetMapping("/register/student")
     public String showStudentRegistrationForm(Model model) {
         model.addAttribute("student", new RegisterStudentDTO());
         return "registerStudent";
     }
 
+    /**
+     * Handles the submission of the student registration form.
+     *
+     * @param studentDTO the student registration data
+     * @param bindingResult the result of the validation
+     * @param model the model to hold success or error messages
+     * @return the name of the view to be rendered
+     */
     @PostMapping("/register/student")
     public String registerStudent(@Valid @ModelAttribute("student") RegisterStudentDTO studentDTO, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
@@ -99,13 +139,26 @@ public class RegisterController {
         }
     }
 
-
+    /**
+     * Displays the admin registration form.
+     *
+     * @param model the model to hold form data
+     * @return the name of the admin registration view
+     */
     @GetMapping("/register/admin")
     public String showAdminRegistrationForm(Model model) {
         model.addAttribute("admin", new RegisterAdminDTO());
         return "registerAdmin";
     }
 
+    /**
+     * Handles the submission of the admin registration form.
+     *
+     * @param adminDTO the admin registration data
+     * @param bindingResult the result of the validation
+     * @param model the model to hold success or error messages
+     * @return the name of the view to be rendered
+     */
     @PostMapping("/register/admin")
     public String registerAdmin(@Valid @ModelAttribute("admin") RegisterAdminDTO adminDTO, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
@@ -120,5 +173,4 @@ public class RegisterController {
             return "registerAdmin";
         }
     }
-
 }

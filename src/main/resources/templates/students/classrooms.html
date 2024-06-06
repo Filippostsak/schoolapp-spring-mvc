@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Student's Classrooms</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/styles/studentsClassroom.css}">
+    <link rel="stylesheet" th:href="@{/styles/navbar.css}">
+    <link rel="stylesheet" th:href="@{/styles/footer.css}">
+</head>
+<body>
+<nav th:replace="~{components/navbar :: navbar}"></nav>
+<div class="container mt-5 mb-5">
+    <h1 class="display-3 text-center mb-4">Student's Classrooms</h1>
+    <h4 class="display-5 text-center mb-4">Welcome, <span th:text="${username}">Student</span></h4>
+    <div class="mb-5">
+        <h5 class="text-center">See all your classrooms you are enrolled!</h5>
+    </div>
+    <div th:each="classroom, iterStat : ${classrooms}" class="mt-5">
+        <div class="row g-4 mb-5 align-items-center">
+            <div class="col-md-6" th:if="${iterStat.index % 2 == 0}">
+                <div class="card" th:style="'background-image: url(' + ${classroom.imageUrl} + ');'">
+                    <div class="card-overlay"></div>
+                    <div class="card-body">
+                        <h2 class="card-title" th:text="${classroom.name}"></h2>
+                        <div th:if="${classroom.meetingDates != null && !classroom.meetingDates.isEmpty()}" class="meeting-dates" th:data-start-date="${classroom.meetingDates[0].date}" th:data-start-time="${classroom.meetingDates[0].time}" th:data-classroom-url="${classroom.classroomUrl}">
+                            <ul>
+                                <li th:each="meetingDate : ${classroom.meetingDates}">
+                                    <p th:text="'Starting Date: ' + ${meetingDate.date}"></p>
+                                    <p th:text="'Starting Time: ' + ${meetingDate.time}"></p>
+                                    <p th:text="'End Date: ' + ${meetingDate.endDate}"></p>
+                                    <p th:text="'End Time: ' + ${meetingDate.endTime}"></p>
+                                </li>
+                            </ul>
+                            <p class="countdown"></p>
+                            <a class="classroom-url" th:href="${classroom.classroomUrl}" style="display:none;">Join Meeting</a>
+                        </div>
+                        <div th:if="${classroom.meetingDates == null || classroom.meetingDates.isEmpty()}">
+                            <p>No meetings scheduled.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="detail-table-container">
+                    <table class="table table-bordered table-gap detail-table">
+                        <tbody>
+                        <tr>
+                            <th>Description</th>
+                            <td th:text="${classroom.description}"></td>
+                        </tr>
+                        <tr>
+                            <th>URL</th>
+                            <td>
+                                <a th:href="${classroom.classroomUrl}" th:text="${classroom.classroomUrl}">URL</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Creator</th>
+                            <td>
+                                <p th:text="'Name: ' + ${classroom.creator.firstname} + ' ' + ${classroom.creator.lastname}"></p>
+                                <p th:text="'Email: ' + ${classroom.creator.email}"></p>
+                                <p th:text="'Username: ' + ${classroom.creator.username}"></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Teachers</th>
+                            <td>
+                                <ul>
+                                    <li th:each="teacher : ${classroom.teachers}">
+                                        <p th:text="'Name: ' + ${teacher.firstname} + ' ' + ${teacher.lastname}"></p>
+                                        <p th:text="'Email: ' + ${teacher.email}"></p>
+                                        <p th:text="'Username: ' + ${teacher.username}"></p>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6" th:if="${iterStat.index % 2 != 0}">
+                <div class="card" th:style="'background-image: url(' + ${classroom.imageUrl} + ');'">
+                    <div class="card-overlay"></div>
+                    <div class="card-body">
+                        <h2 class="card-title" th:text="${classroom.name}"></h2>
+                        <div th:if="${classroom.meetingDates != null && !classroom.meetingDates.isEmpty()}" class="meeting-dates" th:data-start-date="${classroom.meetingDates[0].date}" th:data-start-time="${classroom.meetingDates[0].time}" th:data-classroom-url="${classroom.classroomUrl}">
+                            <ul>
+                                <li th:each="meetingDate : ${classroom.meetingDates}">
+                                    <p th:text="'Starting Date: ' + ${meetingDate.date}"></p>
+                                    <p th:text="'Starting Time: ' + ${meetingDate.time}"></p>
+                                    <p th:text="'End Date: ' + ${meetingDate.endDate}"></p>
+                                    <p th:text="'End Time: ' + ${meetingDate.endTime}"></p>
+                                </li>
+                            </ul>
+                            <p class="countdown"></p>
+                            <a class="classroom-url" th:href="${classroom.classroomUrl}" style="display:none;">Join Meeting</a>
+                        </div>
+                        <div th:if="${classroom.meetingDates == null || classroom.meetingDates.isEmpty()}">
+                            <p>No meetings scheduled.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Students Table -->
+        <div class="students-table-container mb-5">
+            <h3 class="text-center">See your classmates!</h3>
+            <table class="table table-bordered table-gap students-table mb-5">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="student : ${classroom.studentsOfClassroom}">
+                    <td th:text="${student.firstname} + ' ' + ${student.lastname}"></td>
+                    <td th:text="${student.email}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="d-flex justify-content-center mb-5 mt-5">
+    <a class="btn btn-primary" th:href="@{/students/dashboard}">go back to dashboard</a>
+</div>
+<footer th:replace="~{components/footer :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script th:src="@{/js/studentsClassroom.js}"></script>
+</body>
+</html>

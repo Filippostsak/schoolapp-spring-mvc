@@ -132,6 +132,13 @@ public class Mapper {
         );
     }
 
+    /**
+     * Converts a Teacher model to a GetTeachersIdDTO.
+     *
+     * @param teacher the Teacher model to convert
+     * @return the corresponding GetTeachersIdDTO
+     */
+
     public static GetTeachersIdDTO extractGetTeachersIdDTOFromTeacher(Teacher teacher) {
         return new GetTeachersIdDTO(teacher.getId(), teacher.getFirstname(), teacher.getLastname());
     }
