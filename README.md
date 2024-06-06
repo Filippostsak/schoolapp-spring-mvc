@@ -1,3 +1,7 @@
+#### UPCOMING UPDATES
+- [ADMIN] all the CRUD for all the entities
+- [ADMIN] dynamic search for all the entities
+
 ## School App (Spring Boot MVC)
 
 ### Description
