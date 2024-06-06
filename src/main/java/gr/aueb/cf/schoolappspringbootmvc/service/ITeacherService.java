@@ -69,5 +69,20 @@ public interface ITeacherService {
 
     List<Teacher> findByUsernameContaining(String username) throws Exception;
 
+    /**
+     * Retrieves a teacher by their id.
+     *
+     * @param id the id to search for.
+     * @return an Optional containing the teacher with the matching id if found, otherwise empty.
+     */
+
     Optional<GetTeachersIdDTO> findById(Long id) throws Exception;
+
+    /**
+     * Retrieves a teacher by their id.
+     *
+     * @param teacherId the id to search for.
+     * @return the teacher with the matching id.
+     */
+    Teacher getUserIdByTeacherId(Long teacherId);
 }

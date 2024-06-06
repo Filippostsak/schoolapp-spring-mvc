@@ -14,16 +14,50 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementation of the {@link IMeetingDateService} interface.
+ * Provides methods for creating, updating and deleting meeting dates.
+ */
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class MeetingDateServiceImpl implements IMeetingDateService {
 
+
+    /**
+     * The repository for managing meeting dates.
+     */
     private final MeetingDateRepository meetingDateRepository;
+
+    /**
+     * The repository for managing classrooms.
+     */
+
     private final ClassroomRepository classroomRepository;
+
+    /**
+     * The service for managing teachers.
+     */
     private final ITeacherService teacherService;
+
+    /**
+     * The mapper for converting between meeting date data transfer objects and entities.
+     */
     private final MeetingDateMapper meetingDateMapper;
+
+    /**
+     * The mapper for converting between classroom data transfer objects and entities.
+     */
     private final ClassroomMapper classroomMapper;
+
+    /**
+     * Creates a meeting date.
+     *
+     * @param classroomId the id of the classroom.
+     * @param createMeetingDateDTO the data for creating the meeting date.
+     * @return the created meeting date.
+     */
 
     @Override
     @Transactional
@@ -41,6 +75,12 @@ public class MeetingDateServiceImpl implements IMeetingDateService {
         return meetingDateRepository.save(meetingDate);
     }
 
+    /**
+     * Deletes a meeting date.
+     *
+     * @param meetingDateId the id of the meeting date.
+     */
+
     @Override
     @Transactional
     public void deleteMeetingDate(Long meetingDateId) {
@@ -48,6 +88,15 @@ public class MeetingDateServiceImpl implements IMeetingDateService {
                .orElseThrow(() -> new RuntimeException("Meeting date not found"));
        meetingDateRepository.delete(meetingDate);
     }
+
+    /**
+     * Updates a meeting date.
+     *
+     * @param classroomId the id of the classroom.
+     * @param meetingDateId the id of the meeting date.
+     * @param dto the data for updating the meeting date.
+     * @return the updated meeting date.
+     */
 
     @Override
     public MeetingDate updateMeetingDate(Long classroomId, Long meetingDateId, UpdateMeetingDateDTO dto) {

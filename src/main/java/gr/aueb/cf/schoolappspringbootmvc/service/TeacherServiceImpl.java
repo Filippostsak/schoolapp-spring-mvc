@@ -23,14 +23,31 @@ import java.util.Optional;
  * Implementation of the {@link ITeacherService} interface.
  * Provides methods for registering and retrieving teachers.
  */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class TeacherServiceImpl implements ITeacherService {
 
+
+    /**
+     * The repository for managing teachers.
+     */
     private final TeacherRepository teacherRepository;
+
+    /**
+     * The repository for managing users.
+     */
     private final UserRepository userRepository;
+
+    /**
+     * The password encoder for encoding user passwords.
+     */
     private final PasswordEncoder passwordEncoder;
+
+    /**
+     * The service for managing students.
+     */
     private final StudentServiceImpl studentServiceImpl;
 
     /**
@@ -40,6 +57,7 @@ public class TeacherServiceImpl implements ITeacherService {
      * @return the registered teacher.
      * @throws TeacherAlreadyExistsException if a teacher with the specified username already exists.
      */
+
     @Override
     public Teacher registerTeacher(RegisterTeacherDTO dto) throws TeacherAlreadyExistsException {
         log.info("Attempting to register a new teacher with username: {}", dto.getUsername());
@@ -74,6 +92,7 @@ public class TeacherServiceImpl implements ITeacherService {
      * @return a list of all teachers.
      * @throws Exception if an error occurs while retrieving the teachers.
      */
+
     @Override
     public List<Teacher> findAllTeachers() throws Exception {
         log.info("Retrieving all teachers");
@@ -93,6 +112,7 @@ public class TeacherServiceImpl implements ITeacherService {
      * @param lastName the last name to search for.
      * @return a list of students with matching last names.
      */
+
     @Override
     public List<Student> searchStudentsByLastName(String lastName) {
         log.info("Searching for students with last name: {}", lastName);
@@ -112,6 +132,7 @@ public class TeacherServiceImpl implements ITeacherService {
      * @param firstname the first name to search for.
      * @return the teacher with the matching first name.
      */
+
     @Override
     public Teacher findTeacherByFirstname(String firstname) {
         log.info("Searching for teacher with first name: {}", firstname);
@@ -134,6 +155,7 @@ public class TeacherServiceImpl implements ITeacherService {
      *
      * @return an Optional containing the current teacher if found, otherwise empty.
      */
+
     @Override
     public Optional<Teacher> getCurrentAuthenticatedTeacher() {
         String username = getCurrentUsername();
@@ -152,6 +174,13 @@ public class TeacherServiceImpl implements ITeacherService {
         }
     }
 
+    /**
+     * Retrieves a teacher by their username.
+     *
+     * @param username the username to search for.
+     * @return an Optional containing the teacher with the matching username if found, otherwise empty.
+     */
+
     @Override
     public Optional<Teacher> findByUsername(String username) {
         log.info("Searching for teacher with username: {}", username);
@@ -169,6 +198,13 @@ public class TeacherServiceImpl implements ITeacherService {
         }
     }
 
+    /**
+     * Retrieves a teacher by their username containing the specified string.
+     * @param username the string to search for in the username.
+     * @return an Optional containing the teacher with the matching username if found, otherwise empty.
+     * @throws Exception if an error occurs while searching for teachers.
+     */
+
     @Override
     public List<Teacher> findByUsernameContaining(String username) throws Exception {
         log.info("Searching for teachers with username containing: {}", username);
@@ -181,6 +217,12 @@ public class TeacherServiceImpl implements ITeacherService {
             throw new Exception("Error searching for teachers", e);
         }
     }
+
+    /**
+     * Retrieves a teacher by their id.
+     * @param id the id to search for.
+     * @return an Optional containing the teacher with the matching id if found, otherwise empty.
+     */
 
     @Override
     public Optional<GetTeachersIdDTO> findById(Long id) throws Exception {
@@ -203,6 +245,11 @@ public class TeacherServiceImpl implements ITeacherService {
         }
     }
 
+    /**
+     * Retrieves the username of the currently authenticated user.
+     * @return the username of the currently authenticated user.
+     */
+
     private String getCurrentUsername() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
@@ -212,6 +259,21 @@ public class TeacherServiceImpl implements ITeacherService {
         }
     }
 
+    /**
+     * Retrieves the teacher with the specified teacher ID.
+     *
+     * @param teacherId the ID of the teacher to retrieve.
+     * @return the teacher with the specified teacher ID.
+     * @throws RuntimeException if the teacher is not found.
+     */
 
-
+    @Override
+    public Teacher getUserIdByTeacherId(Long teacherId) {
+        try{
+            return teacherRepository.findByUserUsername(teacherRepository.findUsernameByTeacherId(teacherId)).orElseThrow(() -> new RuntimeException("Teacher not found"));
+        } catch (Exception e) {
+            log.error("Error retrieving teacher by teacher id: {}", teacherId, e);
+            throw new RuntimeException("Error retrieving teacher by teacher id", e);
+        }
+    }
 }

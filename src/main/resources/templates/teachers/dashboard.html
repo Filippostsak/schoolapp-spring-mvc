@@ -7,14 +7,6 @@
     <link rel="stylesheet" th:href="@{/styles/teachersDashboard.css}">
     <link rel="stylesheet" th:href="@{/styles/navbar.css}">
     <link rel="stylesheet" th:href="@{/styles/footer.css}">
-    <style>
-        .table-gap tbody tr {
-            border-bottom: 10px solid #f8f9fa; /* Light grey gap between rows */
-        }
-        .table-gap tbody tr:last-child {
-            border-bottom: none; /* Remove bottom border for the last row */
-        }
-    </style>
 </head>
 <body>
 <nav th:replace="~{components/navbar :: navbar}"></nav>
@@ -28,6 +20,9 @@
                 <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'create-classroom')">Create Classroom</a>
                 <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'your-classrooms')">Your Classrooms</a>
                 <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'view-classrooms-and-meetings')">View Classrooms and Meetings</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'send-message-to-student')">Send a message to your student</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'view-messages')">View Messages from Students</a>
+                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'view-notifications')">View Notifications <span id="notification-count" class="badge bg-danger ms-2">0</span></a>
             </div>
         </div>
         <div class="col-md-9 content-container">
@@ -75,6 +70,21 @@
                 </p>
                 <div id="classrooms-and-meetings-list" class="mt-3 table-container"></div>
             </div>
+
+            <div id="send-message-to-student" class="content-section" style="display: none;">
+                <h2>Send a message to your student</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sendMessageModal">Send a Message</button>
+            </div>
+
+            <div id="view-messages" class="content-section" style="display: none;">
+                <h2>View Messages from Students</h2>
+                <div id="messages-list" class="mt-3"></div>
+            </div>
+
+            <div id="view-notifications" class="content-section" style="display: none;">
+                <h2>View Notifications</h2>
+                <div id="notifications-list" class="mt-3"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -96,7 +106,7 @@
             <div class="modal-body">
                 <form id="updateMeetingForm">
                     <input type="hidden" id="updateMeetingId">
-                    <input type="hidden" id="updateClassroomId"> <!-- Add this line -->
+                    <input type="hidden" id="updateClassroomId">
                     <div class="mb-3">
                         <label for="updateDate" class="form-label">Starting Date</label>
                         <input type="date" class="form-control" id="updateDate" required>
@@ -135,10 +145,129 @@
     </div>
 </div>
 
+<!-- Modal for Viewing Messages -->
+<div class="modal fade text-black" id="viewMessagesModal" tabindex="-1" aria-labelledby="viewMessagesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewMessagesModalLabel">Inbox</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="messages-container-view">
+                    <!-- Messages will be dynamically inserted here by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Conversation with Student -->
+<div class="modal fade text-black" id="conversationModal" tabindex="-1" aria-labelledby="conversationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="conversationModalLabel">Conversation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="conversation-container">
+                    <!-- Conversation will be dynamically inserted here by JavaScript -->
+                </div>
+                <div id="reply-container" class="mt-4">
+                    <h5>Reply</h5>
+                    <form id="replyForm">
+                        <div class="mb-3">
+                            <textarea id="reply-content" class="form-control" placeholder="Enter your reply" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Reply</button>
+                        <div class="spinner-border text-primary mt-3" id="replySpinner" role="status" style="display: none;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Sending Messages to Students -->
+<div class="modal fade text-black" id="sendMessageModal" tabindex="-1" aria-labelledby="sendMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendMessageModalLabel">Send a Message to Your Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="sendMessageForm" method="post">
+                    <div id="usernames-container" class="mt-3">
+                        <label for="names-select">Select the receiver</label>
+                        <select id="names-select" name="names-select" class="form-select mb-3"></select>
+                        <label for="message-content">Write your message</label>
+                        <textarea id="message-content" name="message-content" class="form-control mb-3" placeholder="Enter your message"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="sendMessageButton" class="btn btn-primary" type="submit">Send Message</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <div class="spinner-border text-primary mt-3" id="messageSpinner" role="status" style="display: none;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Replying to Messages -->
+<div class="modal fade text-black" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="replyModalLabel">Reply to Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="reply-modal-content"></p>
+                <p id="reply-modal-timestamp"></p>
+                <p id="reply-modal-sender"></p>
+                <div class="mt-4">
+                    <h5>Reply</h5>
+                    <textarea id="reply-message-content" class="form-control mb-3" placeholder="Enter your reply" required></textarea>
+                </div>
+                <div class="spinner-border text-primary mt-3" id="reply-spinner" role="status" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="send-reply-button">Send Reply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
 
 <footer th:replace="~{components/footer :: footer}"></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script th:src="@{/js/teachersDashboard.js}"></script>
+<script th:src="@{/js/teachersMessages.js}"></script>
+<script th:src="@{/js/teachersReceiveMessages.js}"></script>
+<script th:src="@{/js/teachersConversation.js}"></script>
+<script th:src="@{/js/teachersNotification.js}"></script>
+<script th:src="@{/js/replyMessage.js}"></script>
 </body>
 </html>

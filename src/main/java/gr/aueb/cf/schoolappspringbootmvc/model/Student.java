@@ -2,6 +2,7 @@ package gr.aueb.cf.schoolappspringbootmvc.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,9 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a student in the application with fields for first name, last name,
- * associated user, and classroom. Extends {@link AbstractEntity}.
+ * Represents a Student entity in the application.
+ * Extends {@link AbstractEntity}.
+ * It is used to store information about a student, such as the first name, last name, classrooms, teachers, and user associated with the student.
+ * It is also used to define relationships with other entities, such as classrooms, teachers, and users.
  */
+
 @Entity
 @Table(name = "students")
 @EqualsAndHashCode(callSuper = true)
@@ -19,27 +23,65 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Schema(description = "A student entity.")
 public class Student extends AbstractEntity {
+
+    /**
+     * The unique identifier of the student.
+     * It is generated automatically when a new student is created.
+     */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "The unique identifier of the student.")
     private Long id;
 
+    /**
+     * The first name of the student.
+     */
+
+    @Schema(description = "The first name of the student.")
     private String firstname;
 
+    /**
+     * The last name of the student.
+     */
+
+    @Schema(description = "The last name of the student.")
     private String lastname;
+
+    /**
+     * The classrooms associated with this student.
+     * It is a many-to-many relationship.
+     * It is mapped by the "studentsOfClassroom" field in the {@link Classroom} entity.
+     */
 
     @ManyToMany(mappedBy = "studentsOfClassroom")
     @JsonBackReference
+    @Schema(description = "The classrooms associated with this student.")
     private List<Classroom> classrooms = new ArrayList<>();
+
+    /**
+     * The user associated with this student.
+     * It is a one-to-one relationship.
+     * It is cascaded to persist, update, and remove operations.
+     */
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonBackReference
+    @Schema(description = "The user associated with this student.")
     private User user;
+
+    /**
+     * The teachers associated with this student.
+     * It is a many-to-many relationship.
+     * It is mapped by the "students" field in the {@link Teacher} entity.
+     */
 
     @ManyToMany(mappedBy = "students")
     @JsonManagedReference
+    @Schema(description = "The teachers associated with this student.")
     private List<Teacher> teachers = new ArrayList<>();
 
     /**

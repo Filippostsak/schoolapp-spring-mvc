@@ -1,5 +1,6 @@
 package gr.aueb.cf.schoolappspringbootmvc.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,23 +8,49 @@ import lombok.*;
  * Represents an Admin entity in the application.
  * Extends {@link AbstractEntity}.
  */
+
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@Schema(description = "An admin entity.")
 public class Admin extends AbstractEntity {
+
+    /**
+     * The unique identifier of the admin.
+     * It is generated automatically when a new admin is created.
+     */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "The unique identifier of the admin.")
     private Long id;
 
+    /**
+     * The first name of the admin.
+     */
+
+    @Schema(description = "The first name of the admin.")
     private String firstname;
+
+    /**
+     * The last name of the admin.
+     */
+
+    @Schema(description = "The last name of the admin.")
     private String lastname;
+
+    /**
+     * The user associated with this admin.
+     * It is a one-to-one relationship.
+     * It is cascaded to persist, update, and remove operations.
+     */
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @Schema(description = "The user associated with this admin.")
     private User user;
 
     /**
@@ -32,6 +59,7 @@ public class Admin extends AbstractEntity {
      * @param firstname the first name of the admin
      * @param lastname  the last name of the admin
      */
+
     public Admin(String firstname, String lastname) {
         this.firstname = firstname;
         this.lastname = lastname;

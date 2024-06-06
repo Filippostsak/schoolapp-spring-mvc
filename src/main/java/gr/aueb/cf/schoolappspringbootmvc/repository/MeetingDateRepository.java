@@ -13,7 +13,22 @@ import java.util.Optional;
  */
 public interface MeetingDateRepository extends JpaRepository<MeetingDate, Long> {
 
+    /**
+     * Finds a meeting date by the id.
+     *
+     * @param id the id of the meeting date
+     * @return the meeting date with the given id
+     */
+
     Optional<MeetingDate> findById(Long id);
+
+    /**
+     * Finds meeting dates by the classroom.
+     *
+     * @param classroom the classroom of the meeting date
+     * @return the meeting dates with the given classroom
+     */
+
     List<MeetingDate> findByClassroom(Classroom classroom);
 
 }

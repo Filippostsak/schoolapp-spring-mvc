@@ -1,5 +1,6 @@
 package gr.aueb.cf.schoolappspringbootmvc.dto.student;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Setter
+@Schema(description = "A data transfer object (DTO) for registering a student.")
 public class RegisterStudentDTO {
 
     /**
@@ -29,6 +31,7 @@ public class RegisterStudentDTO {
      */
     @NotNull
     @Size(min = 3, max = 32)
+    @Schema(description = "The username of the student. It must be between 3 and 32 characters long. It cannot be null.")
     private String username;
 
     /**
@@ -37,6 +40,7 @@ public class RegisterStudentDTO {
      */
     @NotNull
     @Email
+    @Schema(description = "The email address of the student. It must be a valid email format. It cannot be null.")
     private String email;
 
     /**
@@ -48,6 +52,7 @@ public class RegisterStudentDTO {
     @Size(min = 5, max = 32)
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{5,32}$",
             message = "Password must be between 5 and 32 characters, include at least one uppercase letter, one lowercase letter, one number, and one special character.")
+    @Schema(description = "The password of the student. It must be between 5 and 32 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character. It cannot be null.")
     private String password;
 
     /**
@@ -56,6 +61,7 @@ public class RegisterStudentDTO {
      */
     @NotNull
     @Size(min = 5, max = 32)
+    @Schema(description = "The password confirmation field. It must be between 5 and 32 characters long. It cannot be null.")
     private String confirmPassword;
 
     /**
@@ -64,6 +70,7 @@ public class RegisterStudentDTO {
      */
     @NotNull
     @Size(min = 3, max = 32)
+    @Schema(description = "The first name of the student. It must be between 3 and 32 characters long. It cannot be null.")
     private String firstname;
 
     /**
@@ -72,14 +79,16 @@ public class RegisterStudentDTO {
      */
     @NotNull
     @Size(min = 3, max = 32)
+    @Schema(description = "The last name of the student. It must be between 3 and 32 characters long. It cannot be null.")
     private String lastname;
 
     /**
-     * The birth date of the student.
+     * The birthdate of the student.
      * It must be in the format "yyyy-MM-dd" and cannot be null.
      */
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Schema(description = "The birth date of the student. It must be in the format 'yyyy-MM-dd'. It cannot be null.")
     private LocalDate birthDate;
 
     /**
@@ -87,6 +96,7 @@ public class RegisterStudentDTO {
      * It cannot be null.
      */
     @NotNull
+    @Schema(description = "The country of the student. It cannot be null.")
     private String country;
 
     /**
@@ -94,5 +104,6 @@ public class RegisterStudentDTO {
      * It cannot be null.
      */
     @NotNull
+    @Schema(description = "The city of the student. It cannot be null.")
     private String city;
 }

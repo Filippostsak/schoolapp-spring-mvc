@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.io.IOException;
 import java.security.Principal;
 
+/**
+ * Controller for handling login-related requests.
+ * Implements {@link AuthenticationSuccessHandler} and {@link AuthenticationFailureHandler}
+ * to manage successful and failed authentication attempts.
+ */
 @Component
 @RequiredArgsConstructor
 @Controller
@@ -24,6 +29,15 @@ public class LoginController implements AuthenticationSuccessHandler, Authentica
 
     private final IUserService userService;
 
+    /**
+     * Handles GET requests to the "/login" endpoint.
+     * Redirects authenticated users based on their roles.
+     *
+     * @param model     the model to add attributes to
+     * @param principal the currently authenticated user, if any
+     * @param request   the HTTP request
+     * @return the name of the view to be rendered, in this case "login"
+     */
     @GetMapping("/login")
     public String login(Model model, Principal principal, HttpServletRequest request) {
         if (principal != null) {
@@ -44,12 +58,22 @@ public class LoginController implements AuthenticationSuccessHandler, Authentica
 
         // Check if there's an error parameter and pass it to the model
         if (request.getParameter("error") != null) {
+            model.addAttribute("error", true);
             model.addAttribute("errorMessage", "Invalid username or password");
         }
 
         return "login";
     }
 
+    /**
+     * Handles successful authentication attempts.
+     * Redirects authenticated users based on their roles.
+     *
+     * @param request        the HTTP request
+     * @param response       the HTTP response
+     * @param authentication the authentication object containing user details
+     * @throws IOException if an input or output error occurs
+     */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         var user = userService.getUserByUsername(authentication.getName());
@@ -71,10 +95,18 @@ public class LoginController implements AuthenticationSuccessHandler, Authentica
         }
     }
 
+    /**
+     * Handles failed authentication attempts.
+     * Redirects the user to the login page with an error parameter.
+     *
+     * @param request   the HTTP request
+     * @param response  the HTTP response
+     * @param exception the exception thrown during authentication failure
+     * @throws IOException if an input or output error occurs
+     */
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         response.sendRedirect("/login?error=true");
     }
 
 }
-

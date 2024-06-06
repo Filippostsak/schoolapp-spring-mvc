@@ -1,0 +1,130 @@
+.content-section.active {
+    display: block;
+}
+
+.spinner-border {
+    display: none;
+}
+body {
+    background: linear-gradient(to right, black, blue);
+    color: white;
+    font-family: Arial, sans-serif;
+}
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+h1 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+.lead {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+.features-img {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.list-group-item {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    transition: background 0.3s, color 0.3s;
+}
+.list-group-item:hover, .list-group-item.active {
+    background: rgba(255, 255, 255, 0.5);
+    color: black;
+}
+.content-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: none;
+    padding: 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: rotateY(-90deg);
+    transform-origin: left;
+    transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
+}
+.content-section.active {
+    display: block;
+    opacity: 1;
+    transform: rotateY(0);
+}
+.content-container {
+    position: relative;
+    height: 300px;
+    overflow: auto;
+    padding-bottom: 50px;
+}
+.table-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.table-striped tbody tr {
+    background: white;
+    border-bottom: 10px solid #f9f9f9;
+}
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.table-gap tbody tr {
+    border-bottom: 10px solid #f8f9fa; /* Light grey gap between rows */
+}
+.table-gap tbody tr:last-child {
+    border-bottom: none; /* Remove bottom border for the last row */
+}
+
+.table-gap tbody tr {
+    border-bottom: 10px solid #f8f9fa; /* Light grey gap between rows */
+}
+.table-gap tbody tr:last-child {
+    border-bottom: none; /* Remove bottom border for the last row */
+}
+
+.message-item {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.message-item:hover {
+    background-color: #e9ecef;
+}
+.message-item .message-sender {
+    font-weight: bold;
+    color: #495057;
+}
+.message-item .message-content {
+    margin-top: 10px;
+    color: #343a40;
+}
+.message-item .message-timestamp {
+    font-size: 0.875em;
+    color: #6c757d;
+}
+.message-item .btn-reply {
+    margin-top: 10px;
+}
+.sender-group {
+    margin-bottom: 30px;
+}
+.sender-group h5 {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

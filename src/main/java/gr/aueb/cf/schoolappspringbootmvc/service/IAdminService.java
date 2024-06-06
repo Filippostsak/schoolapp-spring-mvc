@@ -1,6 +1,8 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
+import gr.aueb.cf.schoolappspringbootmvc.dto.admin.AdminGetAuthenticatedAdminDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.admin.RegisterAdminDTO;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.exception.AdminNotFoundException;
 import gr.aueb.cf.schoolappspringbootmvc.model.Admin;
 import gr.aueb.cf.schoolappspringbootmvc.service.exceptions.AdminAlreadyExistsException;
 
@@ -27,4 +29,13 @@ public interface IAdminService {
      * @throws Exception if there is an error retrieving the admins.
      */
     List<Admin> findAllAdmins() throws Exception;
+
+    /**
+     * Retrieves the currently authenticated admin.
+     *
+     * @param dto the data transfer object containing the information needed to retrieve the authenticated admin.
+     * @return the authenticated admin.
+     * @throws AdminNotFoundException if the authenticated admin is not found.
+     */
+    AdminGetAuthenticatedAdminDTO getAuthenticatedAdmin(AdminGetAuthenticatedAdminDTO dto) throws AdminNotFoundException;
 }
