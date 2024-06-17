@@ -1,6 +1,7 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
 import gr.aueb.cf.schoolappspringbootmvc.dto.admin.AdminGetAuthenticatedAdminDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.admin.AdminUpdateDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.admin.RegisterAdminDTO;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.exception.AdminNotFoundException;
 import gr.aueb.cf.schoolappspringbootmvc.model.Admin;
@@ -37,5 +38,22 @@ public interface IAdminService {
      * @return the authenticated admin.
      * @throws AdminNotFoundException if the authenticated admin is not found.
      */
+
     AdminGetAuthenticatedAdminDTO getAuthenticatedAdmin(AdminGetAuthenticatedAdminDTO dto) throws AdminNotFoundException;
+
+    /**
+     * Deletes the currently authenticated admin.
+     */
+
+    void deleteCurrentAdmin();
+
+    /**
+     * Updates the currently authenticated admin based on the provided data transfer object.
+     *
+     * @param dto the data transfer object containing the information needed to update the authenticated admin.
+     */
+    void updateAdmin(AdminUpdateDTO dto);
+
+
+
 }

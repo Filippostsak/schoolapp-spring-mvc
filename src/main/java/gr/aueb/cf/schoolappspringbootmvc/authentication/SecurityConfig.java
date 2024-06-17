@@ -46,7 +46,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOrigins(List.of("https://codingfactory.aueb.gr", "http://localhost:4200"));
-        corsConfiguration.setAllowedMethods(List.of("*")); // GET, POST, PUT, DELETE, PATCH
+        corsConfiguration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH"));
         corsConfiguration.setAllowedHeaders(List.of("*")); // Authorization, Content-Type
         corsConfiguration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -82,6 +82,7 @@ public class SecurityConfig {
                         .requestMatchers("/students/**").hasAnyAuthority(Role.STUDENT.name(), Role.ADMIN.name())
                         .requestMatchers("/teachers/**").hasAnyAuthority(Role.TEACHER.name(), Role.ADMIN.name())
                         .requestMatchers("/admins/**").hasAnyAuthority(Role.ADMIN.name())
+                        .requestMatchers("/admin/**").hasAnyAuthority(Role.ADMIN.name())
                         .requestMatchers("/messages/**").hasAnyAuthority(Role.STUDENT.name(), Role.TEACHER.name(), Role.ADMIN.name())
                         .requestMatchers("/notifications/**").hasAnyAuthority(Role.STUDENT.name(), Role.TEACHER.name(), Role.ADMIN.name())
                         .requestMatchers("/v3/api-docs/**").permitAll()

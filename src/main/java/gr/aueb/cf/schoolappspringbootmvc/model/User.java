@@ -103,7 +103,7 @@ public class User extends AbstractEntity implements UserDetails {
      * It is mapped by the "user" field in the {@link Teacher} entity.
      */
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Schema(description = "The teacher associated with this user.")
     @JsonManagedReference
     private Teacher teacher;
@@ -114,7 +114,7 @@ public class User extends AbstractEntity implements UserDetails {
      * It is mapped by the "user" field in the {@link Student} entity.
      */
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Schema(description = "The student associated with this user.")
     @JsonManagedReference
     private Student student;
@@ -125,7 +125,7 @@ public class User extends AbstractEntity implements UserDetails {
      * It is mapped by the "user" field in the {@link Admin} entity.
      */
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Schema(description = "The admin associated with this user.")
     @JsonManagedReference
     private Admin admin;
@@ -133,13 +133,13 @@ public class User extends AbstractEntity implements UserDetails {
     @OneToMany(mappedBy = "sender")
     private List<Message> sentMessages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> receivedNotifications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "sender")
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> sentNotifications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> receivedMessages = new ArrayList<>();
 
     /**

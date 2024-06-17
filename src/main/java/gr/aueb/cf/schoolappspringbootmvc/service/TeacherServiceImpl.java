@@ -2,7 +2,7 @@ package gr.aueb.cf.schoolappspringbootmvc.service;
 
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.GetTeachersIdDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.RegisterTeacherDTO;
-import gr.aueb.cf.schoolappspringbootmvc.mapper.Mapper;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.UserMapper;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
 import gr.aueb.cf.schoolappspringbootmvc.model.User;
@@ -64,8 +64,8 @@ public class TeacherServiceImpl implements ITeacherService {
         Teacher teacher;
         User user;
         try {
-            teacher = Mapper.extractTeacherFromRegisterTeacherDTO(dto);
-            user = Mapper.extractUserFromRegisterTeacherDTO(dto);
+            teacher = UserMapper.extractTeacherFromRegisterTeacherDTO(dto);
+            user = UserMapper.extractUserFromRegisterTeacherDTO(dto);
             Optional<User> userOptional = userRepository.findByUsername(user.getUsername());
             if (userOptional.isPresent()) {
                 log.error("Teacher registration failed: Username {} already exists", user.getUsername());
@@ -233,7 +233,7 @@ public class TeacherServiceImpl implements ITeacherService {
             Optional<Teacher> teacherOptional = teacherRepository.findById(id);
             if (teacherOptional.isPresent()) {
                 log.info("Teacher found with id: {}", id);
-                GetTeachersIdDTO getTeachersIdDTO = Mapper.extractGetTeachersIdDTOFromTeacher(teacherOptional.get());
+                GetTeachersIdDTO getTeachersIdDTO = UserMapper.extractGetTeachersIdDTOFromTeacher(teacherOptional.get());
                 return Optional.of(getTeachersIdDTO);
             } else {
                 log.warn("No teacher found with id: {}", id);

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Users</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/styles/manage-users.css}">
+</head>
+<body>
+<nav th:replace="~{components/navbar :: navbar}"></nav>
+<div class="m-5 p-4">
+    <div class="m-5 p-3 text-center">
+        <div class="shadow-sm rounded p-4">
+            <h1>Hello, <span th:text="${username}"></span></h1>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="mb-3">
+        <input type="text" id="search-input" class="form-control" placeholder="Search by Lastname, Firstname, Role...">
+    </div>
+    <div>
+        <button id="load-users-btn" class="btn btn-primary mb-3">Load all users</button>
+        <button id="create-users-btn" class="btn btn-info mb-3">Create new user</button>
+    </div>
+    <div id="users-table-container" class="table-responsive">
+        <table id="users-table" class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+    <nav class="d-flex justify-content-center">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#" id="previous-page">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="#" id="next-page">Next</a></li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Update User Modal -->
+<div class="modal fade" id="updateUserModal" tabindex="-1" aria-labelledby="updateUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog text-black">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateUserModalLabel">Update User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateUserForm">
+                    <div class="mb-3">
+                        <label for="update-username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="update-username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="update-email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-role" class="form-label">Role</label>
+                        <select class="form-select" id="update-role" name="role" required>
+                            <option value="TEACHER">Teacher</option>
+                            <option value="STUDENT">Student</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-status" class="form-label">Status</label>
+                        <select class="form-select" id="update-status" name="status" required>
+                            <option value="PENDING">Pending</option>
+                            <option value="APPROVED">Approved</option>
+                            <option value="REJECTED">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-firstname" class="form-label">Firstname</label>
+                        <input type="text" class="form-control" id="update-firstname" name="firstname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-lastname" class="form-label">Lastname</label>
+                        <input type="text" class="form-control" id="update-lastname" name="lastname" required>
+                    </div>
+                    <input type="hidden" id="update-id" name="id">
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="update-active" name="active">
+                        <label for="update-active" class="form-check-label">Active</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create User Modal -->
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog text-black">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createUserModalLabel">Create User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createUserForm">
+                    <div class="mb-3">
+                        <label for="create-username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="create-username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="create-email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="create-password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-confirm-password" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="create-confirm-password" name="confirmPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-role" class="form-label">Role</label>
+                        <select class="form-select" id="create-role" name="role" required>
+                            <option value="TEACHER">Teacher</option>
+                            <option value="STUDENT">Student</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-status" class="form-label">Status</label>
+                        <select class="form-select" id="create-status" name="status" required>
+                            <option value="PENDING">Pending</option>
+                            <option value="APPROVED">Approved</option>
+                            <option value="REJECTED">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-firstname" class="form-label">Firstname</label>
+                        <input type="text" class="form-control" id="create-firstname" name="firstname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-lastname" class="form-label">Lastname</label>
+                        <input type="text" class="form-control" id="create-lastname" name="lastname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-birthDate" class="form-label">Birth Date</label>
+                        <input type="date" class="form-control" id="create-birthDate" name="birthDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-country" class="form-label">Country</label>
+                        <input type="text" class="form-control" id="create-country" name="country" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="create-city" name="city" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{components/footer :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script th:src="@{/js/manage-users.js}"></script>
+<script th:src="@{/js/admin-create-user.js}"></script>
+</body>
+</html>

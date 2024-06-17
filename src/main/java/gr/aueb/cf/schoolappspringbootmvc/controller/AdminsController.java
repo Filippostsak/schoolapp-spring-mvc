@@ -7,7 +7,6 @@
 package gr.aueb.cf.schoolappspringbootmvc.controller;
 
 import gr.aueb.cf.schoolappspringbootmvc.dto.admin.AdminGetAuthenticatedAdminDTO;
-import gr.aueb.cf.schoolappspringbootmvc.dto.student.StudentGetCurrentStudentDTO;
 import gr.aueb.cf.schoolappspringbootmvc.service.IAdminService;
 import gr.aueb.cf.schoolappspringbootmvc.service.exceptions.StudentNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -44,5 +43,20 @@ public class AdminsController {
             model.addAttribute("error", "Student not found");
         }
         return "admins/dashboard";
+    }
+
+    @GetMapping("/manage-users")
+    public String manageUsers(Model model){
+        log.info("Attempting to get authenticated admin");
+        AdminGetAuthenticatedAdminDTO dto = new AdminGetAuthenticatedAdminDTO();
+        try{
+            AdminGetAuthenticatedAdminDTO currentAdmin = adminService.getAuthenticatedAdmin(dto);
+            model.addAttribute("username", currentAdmin.getUsername());
+        }catch (Exception e) {
+            log.error("Error retrieving authenticated admin", e);
+            model.addAttribute("error", "Error retrieving authenticated admin");
+            throw new RuntimeException("Error retrieving authenticated admin", e);
+        }
+        return "admins/manage-users";
     }
 }
