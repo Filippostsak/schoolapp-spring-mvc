@@ -1,9 +1,10 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
 import gr.aueb.cf.schoolappspringbootmvc.dto.admin.AdminGetAuthenticatedAdminDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.admin.AdminUpdateDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.admin.RegisterAdminDTO;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.AdminMapper;
-import gr.aueb.cf.schoolappspringbootmvc.mapper.Mapper;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.UserMapper;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.exception.AdminNotFoundException;
 import gr.aueb.cf.schoolappspringbootmvc.model.Admin;
 import gr.aueb.cf.schoolappspringbootmvc.model.User;
@@ -49,8 +50,8 @@ public class AdminServiceImpl implements IAdminService {
         Admin admin;
         User user;
         try {
-            admin = Mapper.extractAdminFromRegisterAdminDTO(dto);
-            user = Mapper.extractUserFromRegisterAdminDTO(dto);
+            admin = UserMapper.extractAdminFromRegisterAdminDTO(dto);
+            user = UserMapper.extractUserFromRegisterAdminDTO(dto);
             if (userRepository.findByUsername(user.getUsername()).isPresent()) {
                 throw new AdminAlreadyExistsException(user.getUsername());
             }
@@ -82,6 +83,14 @@ public class AdminServiceImpl implements IAdminService {
         }
     }
 
+    /**
+     * Retrieves the currently authenticated admin.
+     *
+     * @param dto the data transfer object containing the information needed to retrieve the authenticated admin.
+     * @return the authenticated admin.
+     * @throws AdminNotFoundException if the authenticated admin is not found.
+     */
+
     @Override
     public AdminGetAuthenticatedAdminDTO getAuthenticatedAdmin(AdminGetAuthenticatedAdminDTO dto) throws AdminNotFoundException {
         Admin admin;
@@ -101,12 +110,56 @@ public class AdminServiceImpl implements IAdminService {
             dto = adminMapper.toAdminGetAuthenticatedAdminDTO(admin);
             dto.setUsername(username);
             return dto;
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("An error occurred while retrieving the authenticated admin: {}", e.getMessage());
             throw new AdminNotFoundException("An error occurred while retrieving the authenticated admin.");
         }
-
     }
 
+    /**
+     * Deletes the currently authenticated admin.
+     */
 
+    @Override
+    public void deleteCurrentAdmin() {
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            Optional<User> userOptional = userRepository.findByUsername(username);
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                Admin admin = adminRepository.findByUserUsername(username).orElseThrow(() -> new AdminNotFoundException(username));
+                adminRepository.delete(admin);
+                log.info("Admin with username {} deleted", username);
+                userRepository.delete(user);
+            }
+        } catch (Exception e) {
+            log.error("An error occurred while deleting the authenticated admin: {}", e.getMessage());
+            throw new RuntimeException("An error occurred while deleting the authenticated admin.");
+        }
+    }
+
+    /**
+     * Updates the currently authenticated admin.
+     *
+     * @param dto the data transfer object containing the information needed to update the authenticated admin.
+     */
+
+    @Override
+    public void updateAdmin(AdminUpdateDTO dto) {
+        try {
+            String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+            User currentuser = userRepository.findByUsername(currentUser)
+                    .orElseThrow(() -> new AdminNotFoundException(currentUser));
+            Admin currentAdmin = adminRepository.findByUserUsername(currentUser)
+                    .orElseThrow(() -> new AdminNotFoundException(currentUser));
+            Admin updatedAdmin = adminMapper.mapAdminDTOToAdmin(dto, currentAdmin);
+            adminRepository.save(updatedAdmin);
+            userRepository.save(currentuser);
+            log.info("Admin with username {} updated", currentUser);
+        } catch (Exception e) {
+            log.error("An error occurred while updating the authenticated admin: {}", e.getMessage());
+            throw new RuntimeException("An error occurred while updating the authenticated admin.");
+        }
+    }
 }

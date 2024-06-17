@@ -1,7 +1,7 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.RegisterTeacherDTO;
-import gr.aueb.cf.schoolappspringbootmvc.mapper.Mapper;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.UserMapper;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
 import gr.aueb.cf.schoolappspringbootmvc.model.User;
@@ -54,8 +54,8 @@ public class TeacherServiceImplTest {
                 "John", "Doe", LocalDate.of(1980, 1, 1), "Country", "City"
         );
 
-        User user = Mapper.extractUserFromRegisterTeacherDTO(dto);
-        Teacher teacher = Mapper.extractTeacherFromRegisterTeacherDTO(dto);
+        User user = UserMapper.extractUserFromRegisterTeacherDTO(dto);
+        Teacher teacher = UserMapper.extractTeacherFromRegisterTeacherDTO(dto);
 
         when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(dto.getPassword())).thenReturn("encodedPassword");

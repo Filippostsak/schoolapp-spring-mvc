@@ -55,7 +55,7 @@ public class Teacher extends AbstractEntity {
      * It is cascaded to persist, update, and remove operations.
      */
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonBackReference
     @Schema(description = "The user associated with this teacher.")
@@ -67,7 +67,7 @@ public class Teacher extends AbstractEntity {
      * It is mapped by the "teachers" field in the {@link Classroom} entity.
      */
 
-    @ManyToMany(mappedBy = "teachers")
+    @ManyToMany(mappedBy = "teachers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonBackReference
     @Schema(description = "The classrooms managed by this teacher.")
     private List<Classroom> classrooms = new ArrayList<>();
@@ -78,7 +78,7 @@ public class Teacher extends AbstractEntity {
      * It is mapped by the "extraTeachers" field in the {@link Classroom} entity.
      */
 
-    @ManyToMany(mappedBy = "extraTeachers")
+    @ManyToMany(mappedBy = "extraTeachers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonBackReference
     @Schema(description = "The extra classrooms managed by this teacher.")
     private List<Classroom> extraClassrooms = new ArrayList<>();

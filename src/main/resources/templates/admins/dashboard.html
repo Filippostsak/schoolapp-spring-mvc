@@ -17,8 +17,6 @@
         <div class="col-md-3">
             <div class="list-group">
                 <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'manage-users')">Manage Users</a>
-                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'manage-roles')">Manage Roles</a>
-                <a href="#" class="list-group-item list-group-item-action" onclick="showSection(event, 'system-settings')">System Settings</a>
             </div>
         </div>
         <div class="col-md-9 content-container">
@@ -32,26 +30,6 @@
                     Use this section to manage all the users in the system. You can view user details, edit user information, and more.
                 </p>
                 <a href="#" th:href="@{/admins/manage-users}" class="btn btn-primary mt-3" onclick="showSpinner(event, this)">Manage Users</a>
-                <div class="spinner-border text-primary mt-3" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-            <div id="manage-roles" class="content-section">
-                <h2>Manage Roles</h2>
-                <p class="text-info mt-3 shadow-sm p-3 rounded bg-light">
-                    Use this section to manage user roles in the system. You can add new roles, edit existing roles, and assign roles to users.
-                </p>
-                <a href="#" th:href="@{/admins/manage-roles}" class="btn btn-primary mt-3" onclick="showSpinner(event, this)">Manage Roles</a>
-                <div class="spinner-border text-primary mt-3" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-            <div id="system-settings" class="content-section">
-                <h2>System Settings</h2>
-                <p class="text-info mt-3 shadow-sm p-3 rounded bg-light">
-                    Use this section to configure system settings. You can update system preferences, manage system configurations, and more.
-                </p>
-                <a href="#" th:href="@{/admins/system-settings}" class="btn btn-primary mt-3" onclick="showSpinner(event, this)">System Settings</a>
                 <div class="spinner-border text-primary mt-3" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>

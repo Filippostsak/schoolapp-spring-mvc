@@ -99,6 +99,67 @@ The application exposes various RESTful endpoints to manage school entities. Key
 
 ### RESTful APIs
 
+#### AdminRestController
+- **Endpoint:** `/admin/delete/me`
+  - **Method:** `DELETE`
+  - **Description:** Deletes the authenticated admin.
+  - **Response:** `Void`
+
+- **Endpoint:** `/admin/update/me`
+  - **Method:** `PUT`
+  - **Description:** Updates the authenticated admin.
+  - **Response:** `Void`
+
+- **Endpoint:** `/admin/get-user/{username}`
+  - **Method:** `GET`
+  - **Description:** Finds a user by username.
+  - **Response:** `Optional<UserDTO>`
+
+- **Endpoint:** `/admin/get-by-email/{email}`
+  - **Method:** `GET`
+  - **Description:** Finds a user by email.
+  - **Response:** `Optional<UserDTO>`
+
+- **Endpoint:** `/admin/get/id/{id}`
+  - **Method:** `GET`
+  - **Description:** Finds a user by ID.
+  - **Response:** `UserDTO`
+
+- **Endpoint:** `/admin/get/role/{role}`
+  - **Method:** `GET`
+  - **Description:** Finds users by role.
+  - **Response:** List of `UserDTO`
+
+- **Endpoint:** `/admin/get-all`
+  - **Method:** `GET`
+  - **Description:** Finds all users.
+  - **Response:** `Page<UserDTO>`
+
+- **Endpoint:** `/admin/get/{status}`
+  - **Method:** `GET`
+  - **Description:** Finds users by status.
+  - **Response:** List of `UserDTO`
+
+- **Endpoint:** `/admin/delete/{id}`
+  - **Method:** `DELETE`
+  - **Description:** Deletes a user by ID.
+  - **Response:** `Void`
+
+- **Endpoint:** `/admin/update/{id}`
+  - **Method:** `PATCH`
+  - **Description:** Updates a user by ID.
+  - **Response:** `UserUpdateDTO`
+
+- **Endpoint:** `/admin/create`
+  - **Method:** `POST`
+  - **Description:** Creates a new user.
+  - **Response:** `Map<String, String>`
+
+- **Endpoint:** `/admin/search`
+  - **Method:** `GET`
+  - **Description:** Searches for users by keyword.
+  - **Response:** `Page<UserDTO>`
+
 #### ClassroomRestController
 - **Endpoint:** `/classrooms/student/{studentId}`
   - **Method:** `GET`
@@ -423,6 +484,10 @@ The application exposes various RESTful endpoints to manage school entities. Key
   - **Method:** `GET`
   - **Description:** Displays the admin dashboard with the current authenticated admin's information.
 
+- **Endpoint:** `/admins/manage-users`
+- **Method:** `GET`
+- **Description:** Displays the user management page with a list of users.
+
 
 ### Service Exceptions
 
@@ -486,7 +551,7 @@ The application exposes various RESTful endpoints to manage school entities. Key
 ### Service Interfaces
 
 #### IAdminService
-- **Description:** Service interface for managing administrators.
+- **Description:** Service for managing administrators.
 - **Methods:**
   - `Admin registerAdmin(RegisterAdminDTO dto) throws AdminAlreadyExistsException`
     - **Description:** Registers a new administrator.
@@ -499,6 +564,11 @@ The application exposes various RESTful endpoints to manage school entities. Key
     - **Description:** Retrieves the currently authenticated admin.
     - **Parameters:** `dto` - the data transfer object containing the information needed to retrieve the authenticated admin.
     - **Returns:** The authenticated admin.
+  - `void deleteCurrentAdmin()`
+    - **Description:** Deletes the currently authenticated admin.
+  - `void updateAdmin(AdminUpdateDTO dto)`
+    - **Description:** Updates the currently authenticated admin based on the provided data transfer object.
+    - **Parameters:** `dto` - the data transfer object containing the information needed to update the authenticated admin.
 
 #### IClassroomService
 - **Description:** Service for managing classrooms.
@@ -583,7 +653,227 @@ The application exposes various RESTful endpoints to manage school entities. Key
     - **Description:** Retrieves all classrooms by teacher id.
     - **Parameters:** `teacherId` - the id of the teacher.
     - **Returns:** A list of classrooms by teacher id.
-      }
+
+#### IUserService
+- **Description:** Service interface for managing users.
+- **Methods:**
+  - `User getUserByUsername(String username) throws UsernameNotFoundException`
+    - **Description:** Retrieves a user by their username.
+    - **Parameters:** `username` - the username of the user to be retrieved.
+    - **Returns:** The user with the specified username.
+  - `User getTeacherIdByUsername(String username)`
+    - **Description:** Retrieves a teacher by their username.
+    - **Parameters:** `username` - the username of the teacher to be retrieved.
+    - **Returns:** The teacher with the specified username.
+  - `User getStudentIdByEmail(String email)`
+    - **Description:** Retrieves a student by their email.
+    - **Parameters:** `email` - the email of the student to be retrieved.
+    - **Returns:** The student with the specified email.
+  - `User getUserIdByUsername(String username)`
+    - **Description:** Retrieves a user by their username.
+    - **Parameters:** `username` - the username of the user to be retrieved.
+    - **Returns:** The user with the specified username.
+  - `Optional<UserGetUsernameDTO> getUsernameById(Long id)`
+    - **Description:** Retrieves a user by their id.
+    - **Parameters:** `id` - the id of the user to be retrieved.
+    - **Returns:** The user with the specified id.
+  - `Optional<User> findByUsername(String username)`
+    - **Description:** Retrieves a user by their username.
+    - **Parameters:** `username` - the username of the user to be retrieved.
+    - **Returns:** An optional user with the specified username.
+  - `Optional<UserDTO> findUserByUsername(String username)`
+    - **Description:** Retrieves a user by their username.
+    - **Parameters:** `username` - the username of the user to be retrieved.
+    - **Returns:** An optional user with the specified username.
+  - `Optional<UserDTO> findUserByEmail(String email)`
+    - **Description:** Retrieves a user by their email.
+    - **Parameters:** `email` - the email of the user to be retrieved.
+    - **Returns:** An optional user with the specified email.
+  - `UserDTO findUserById(Long id)`
+    - **Description:** Retrieves a user by their id.
+    - **Parameters:** `id` - the id of the user to be retrieved.
+    - **Returns:** The user with the specified id.
+  - `List<UserDTO> findUserByRole(Role role)`
+    - **Description:** Retrieves users by their role.
+    - **Parameters:** `role` - the role of the users to be retrieved.
+    - **Returns:** A list of users with the specified role.
+  - `Page<UserDTO> findAllUsers(Pageable pageable)`
+    - **Description:** Retrieves all users.
+    - **Parameters:** `pageable` - pagination information.
+    - **Returns:** A paginated list of all users.
+  - `List<UserDTO> findUserByStatus(Status status)`
+    - **Description:** Retrieves users by their status.
+    - **Parameters:** `status` - the status of the users to be retrieved.
+    - **Returns:** A list of users with the specified status.
+  - `void deleteUserById(Long id)`
+    - **Description:** Deletes a user by their id.
+    - **Parameters:** `id` - the id of the user to be deleted.
+  - `Optional<User> updateUser(UserUpdateDTO dto)`
+    - **Description:** Updates a user.
+    - **Parameters:** `dto` - the data transfer object containing the updated information of the user.
+    - **Returns:** An optional updated user.
+  - `void createUser(UserCreateDTO userCreateDTO)`
+    - **Description:** Creates a user.
+    - **Parameters:** `userCreateDTO` - the data transfer object containing the information needed to create a user.
+  - `Page<UserDTO> searchUsers(String keyword, Pageable pageable)`
+    - **Description:** Searches for users based on a keyword.
+    - **Parameters:** `keyword` - the keyword to search for, `pageable` - pagination information.
+    - **Returns:** A paginated list of users that match the keyword.
+
+#### IMeetingDateService
+- **Description:** Service for managing meeting dates.
+- **Methods:**
+  - `MeetingDate createMeetingDate(Long classroomId, CreateMeetingDateDTO createMeetingDateDTO)`
+    - **Description:** Creates a meeting date.
+    - **Parameters:** `classroomId` - the id of the classroom, `createMeetingDateDTO` - the data for creating the meeting date.
+    - **Returns:** The created meeting date.
+  - `void deleteMeetingDate(Long meetingDateId)`
+    - **Description:** Deletes a meeting date.
+    - **Parameters:** `meetingDateId` - the id of the meeting date.
+  - `MeetingDate updateMeetingDate(Long classroomId, Long meetingDateId, UpdateMeetingDateDTO dto)`
+    - **Description:** Updates a meeting date.
+    - **Parameters:** `classroomId` - the id of the classroom, `meetingDateId` - the id of the meeting date, `dto` - the data for updating the meeting date.
+    - **Returns:** The updated meeting date.
+
+#### IMessageService
+- **Description:** Service interface for managing messages.
+- **Methods:**
+  - `List<GetMessageDTO> getMessagesBySenderId(Long senderId) throws MessageDontFoundException`
+    - **Description:** Retrieves messages by the ID of the sender.
+    - **Parameters:** `senderId` - the ID of the sender.
+    - **Returns:** A list of `GetMessageDTO`.
+  - `List<GetMessageDTO> getMessagesByReceiverId(Long receiverId) throws MessageDontFoundException`
+    - **Description:** Retrieves messages by the ID of the receiver.
+    - **Parameters:** `receiverId` - the ID of the receiver.
+    - **Returns:** A list of `GetMessageDTO`.
+  - `List<GetMessageDTO> getMessagesBySenderIdAndReceiverId(Long senderId, Long receiverId) throws MessageDontFoundException`
+    - **Description:** Retrieves messages by the IDs of both the sender and the receiver.
+    - **Parameters:** `senderId` - the ID of the sender, `receiverId` - the ID of the receiver.
+    - **Returns:** A list of `GetMessageDTO`.
+  - `SendMessageDTO createMessage(SendMessageDTO sendMessageDTO) throws MessageDontFoundException`
+    - **Description:** Creates a new message.
+    - **Parameters:** `sendMessageDTO` - the message data.
+    - **Returns:** The created `SendMessageDTO`.
+  - `GetMessageDTO updateMessage(UpdateMessageDTO updateMessageDTO) throws MessageDontFoundException`
+    - **Description:** Updates an existing message.
+    - **Parameters:** `updateMessageDTO` - the message data to update.
+    - **Returns:** The updated `GetMessageDTO`.
+  - `void deleteMessage(DeleteMessageDTO deleteMessageDTO) throws MessageDontFoundException`
+    - **Description:** Deletes a message.
+    - **Parameters:** `deleteMessageDTO` - the message data to delete.
+  - `Long getCurrentTeacherId() throws MessageDontFoundException`
+    - **Description:** Retrieves the current teacher's ID.
+    - **Returns:** The ID of the current teacher.
+  - `GetMessageDTO getMessageById(Long id) throws EntityNotFoundException`
+    - **Description:** Retrieves a message by its ID.
+    - **Parameters:** `id` - the ID of the message.
+    - **Returns:** The retrieved `GetMessageDTO`.
+  - `List<GetMessageDTO> getMessagesByStudentId(Long studentId)`
+    - **Description:** Retrieves messages by the ID of the student.
+    - **Parameters:** `studentId` - the ID of the student.
+    - **Returns:** A list of `GetMessageDTO`.
+
+#### INotificationService
+- **Description:** Service interface for managing notifications.
+- **Methods:**
+  - `List<GetNotificationDTO> getNotificationsByReceiverId(Long receiverId) throws NotificationNotFoundException`
+    - **Description:** Retrieves notifications by the ID of the receiver.
+    - **Parameters:** `receiverId` - the ID of the receiver.
+    - **Returns:** A list of `GetNotificationDTO`.
+  - `GetNotificationDTO createNotification(SendNotificationDTO sendNotificationDTO) throws NotificationNotFoundException`
+    - **Description:** Creates a new notification.
+    - **Parameters:** `sendNotificationDTO` - the notification data.
+    - **Returns:** The created `GetNotificationDTO`.
+  - `GetNotificationDTO updateNotification(UpdateNotification updateNotificationDTO) throws NotificationNotFoundException`
+    - **Description:** Updates an existing notification.
+    - **Parameters:** `updateNotificationDTO` - the notification data to update.
+    - **Returns:** The updated `GetNotificationDTO`.
+  - `void deleteNotification(DeleteNotification deleteNotificationDTO) throws NotificationNotFoundException`
+    - **Description:** Deletes a notification.
+    - **Parameters:** `deleteNotificationDTO` - the notification data to delete.
+  - `void markNotificationAsRead(Long notificationId) throws NotificationNotFoundException`
+    - **Description:** Marks a notification as read.
+    - **Parameters:** `notificationId` - the ID of the notification to mark as read.
+  - `void markNotificationAsUnread(Long notificationId) throws NotificationNotFoundException`
+    - **Description:** Marks a notification as unread.
+    - **Parameters:** `notificationId` - the ID of the notification to mark as unread.
+  - `void markAllNotificationsAsRead(Long receiverId) throws NotificationNotFoundException`
+    - **Description:** Marks all notifications as read for a specific receiver.
+    - **Parameters:** `receiverId` - the ID of the receiver.
+
+#### IStudentService
+- **Description:** Service interface for managing students.
+- **Methods:**
+  - `Student registerStudent(RegisterStudentDTO dto) throws StudentAlreadyExistsException`
+    - **Description:** Registers a new student.
+    - **Parameters:** `dto` - the DTO containing the student's registration information.
+    - **Returns:** The registered student.
+  - `List<Student> findAllStudents() throws Exception`
+    - **Description:** Retrieves all students.
+    - **Returns:** A list of all students.
+  - `List<Student> findByLastnameContainingOrderByLastname(String lastname)`
+    - **Description:** Searches for students whose last names contain the specified substring, ordered by their last names.
+    - **Parameters:** `lastname` - the substring to search for in last names.
+    - **Returns:** A list of students whose last names contain the specified substring.
+  - `List<Student> searchStudentsByLastname(String lastname)`
+    - **Description:** Searches for students by their last names.
+    - **Parameters:** `lastname` - the last name to search for.
+    - **Returns:** A list of students with the specified last name.
+  - `SearchStudentToClassroomDTO getStudentClassrooms(Long studentId) throws ClassroomNotFoundException`
+    - **Description:** Retrieves the classrooms associated with a specific student.
+    - **Parameters:** `studentId` - the ID of the student.
+    - **Returns:** A DTO containing the student's classroom information.
+  - `StudentGetCurrentStudentDTO getCurrentAuthenticatedStudent(StudentGetCurrentStudentDTO dto) throws StudentNotFoundException`
+    - **Description:** Retrieves the student with the specified ID.
+    - **Parameters:** `dto` - the ID of the student.
+    - **Returns:** The student with the specified ID.
+  - `Student getStudentIdByUsername(String username) throws StudentNotFoundException`
+    - **Description:** Retrieves the student with the specified ID.
+    - **Parameters:** `username` - the ID of the student.
+    - **Returns:** The student with the specified ID.
+  - `List<StudentGetUsernameAndIdDTO> findStudentUsernamesAndIdsByClassroomId(Long classroomId)`
+    - **Description:** Retrieves the student with the specified classroom ID.
+    - **Parameters:** `classroomId` - the ID of the classroom.
+    - **Returns:** The student with the specified ID.
+
+#### ITeacherService
+- **Description:** Service interface for managing teachers.
+- **Methods:**
+  - `Teacher registerTeacher(RegisterTeacherDTO dto) throws TeacherAlreadyExistsException`
+    - **Description:** Registers a new teacher.
+    - **Parameters:** `dto` - the data transfer object containing teacher registration information.
+    - **Returns:** The registered teacher.
+  - `List<Teacher> findAllTeachers() throws Exception`
+    - **Description:** Retrieves all teachers.
+    - **Returns:** A list of all teachers.
+  - `List<Student> searchStudentsByLastName(String lastName)`
+    - **Description:** Searches for students by their last name.
+    - **Parameters:** `lastName` - the last name to search for.
+    - **Returns:** A list of students with matching last names.
+  - `Teacher findTeacherByFirstname(String firstname)`
+    - **Description:** Finds a teacher by their first name.
+    - **Parameters:** `firstname` - the first name to search for.
+    - **Returns:** The teacher with the matching first name.
+  - `Optional<Teacher> getCurrentAuthenticatedTeacher()`
+    - **Description:** Retrieves the currently authenticated teacher.
+    - **Returns:** An Optional containing the current teacher if found, otherwise empty.
+  - `Optional<Teacher> findByUsername(String username)`
+    - **Description:** Retrieves a teacher by their username.
+    - **Parameters:** `username` - the username to search for.
+    - **Returns:** An Optional containing the teacher with the matching username if found, otherwise empty.
+  - `List<Teacher> findByUsernameContaining(String username) throws Exception`
+    - **Description:** Retrieves a teacher by their username containing the specified string.
+    - **Parameters:** `username` - the string to search for in the username.
+    - **Returns:** A list of teachers with usernames containing the specified string.
+  - `Optional<GetTeachersIdDTO> findById(Long id) throws Exception`
+    - **Description:** Retrieves a teacher by their id.
+    - **Parameters:** `id` - the id to search for.
+    - **Returns:** An Optional containing the teacher with the matching id if found, otherwise empty.
+  - `Teacher getUserIdByTeacherId(Long teacherId)`
+    - **Description:** Retrieves a teacher by their id.
+    - **Parameters:** `teacherId` - the id to search for.
+    - **Returns:** The teacher with the matching id.
+
 
 ### Service Implementations
 
@@ -594,13 +884,43 @@ The application exposes various RESTful endpoints to manage school entities. Key
     - **Description:** Registers a new admin.
     - **Parameters:** `dto` - the data transfer object containing admin registration information.
     - **Returns:** The registered admin.
+    - **Implementation:**
+      - Extracts `Admin` and `User` entities from the `RegisterAdminDTO`.
+      - Checks if a user with the same username already exists.
+      - Encodes the user's password.
+      - Associates the `User` with the `Admin`.
+      - Saves the `Admin` entity to the repository.
   - `List<Admin> findAllAdmins() throws Exception`
     - **Description:** Retrieves all admins.
     - **Returns:** A list of all admins.
+    - **Implementation:**
+      - Fetches all `Admin` entities from the repository.
+      - Logs and handles any errors that occur during retrieval.
   - `AdminGetAuthenticatedAdminDTO getAuthenticatedAdmin(AdminGetAuthenticatedAdminDTO dto) throws AdminNotFoundException`
     - **Description:** Retrieves the currently authenticated admin.
     - **Parameters:** `dto` - the data transfer object containing the information needed to retrieve the authenticated admin.
     - **Returns:** The authenticated admin.
+    - **Implementation:**
+      - Retrieves the username of the authenticated user from the security context.
+      - Finds the corresponding `User` entity by username.
+      - Retrieves the associated `Admin` entity by username.
+      - Maps the `Admin` entity to `AdminGetAuthenticatedAdminDTO` and returns it.
+  - `void deleteCurrentAdmin()`
+    - **Description:** Deletes the currently authenticated admin.
+    - **Implementation:**
+      - Retrieves the username of the authenticated user from the security context.
+      - Finds the corresponding `User` entity by username.
+      - Deletes the associated `Admin` entity and the `User` entity.
+      - Logs and handles any errors that occur during deletion.
+  - `void updateAdmin(AdminUpdateDTO dto)`
+    - **Description:** Updates the currently authenticated admin based on the provided data transfer object.
+    - **Parameters:** `dto` - the data transfer object containing the information needed to update the authenticated admin.
+    - **Implementation:**
+      - Retrieves the username of the authenticated user from the security context.
+      - Finds the corresponding `User` and `Admin` entities by username.
+      - Maps the `AdminUpdateDTO` to the `Admin` entity.
+      - Saves the updated `Admin` and `User` entities to the repository.
+      - Logs and handles any errors that occur during the update.
 
 #### ClassroomServiceImpl
 - **Description:** Implementation of the `IClassroomService` interface. Provides methods for managing classrooms.
@@ -870,6 +1190,8 @@ DTOs are used to transfer data between the client and server. Key DTOs include:
 
 ### Admin DTOs
 
+### Admin DTOs
+
 #### AdminGetAuthenticatedAdminDTO
 - **Description:** Data Transfer Object (DTO) for authenticated admin information.
 - **Fields:**
@@ -888,6 +1210,18 @@ DTOs are used to transfer data between the client and server. Key DTOs include:
   - `@NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") private LocalDate birthDate`: The birthdate of the admin. Must be in the format "yyyy-MM-dd".
   - `@NotNull private String country`: The country of the admin.
   - `@NotNull private String city`: The city of the admin.
+
+#### AdminUpdateDTO
+- **Description:** Data Transfer Object (DTO) for updating admin information.
+- **Fields:**
+  - `private String firstname`: The first name of the admin.
+  - `private String lastname`: The last name of the admin.
+  - `@Size(max = 50) private String username`: The username of the admin. Cannot exceed 50 characters.
+  - `@Email private String email`: The email of the admin. Must be a valid email format.
+  - `private String password`: The password of the admin.
+  - `@DateTimeFormat(pattern = "yyyy-MM-dd") private LocalDate birthDate`: The birthdate of the admin. Must be in the format "yyyy-MM-dd".
+  - `private String country`: The country of the admin.
+  - `private String city`: The city of the admin.
 
 ### Classroom DTOs
 
@@ -1204,6 +1538,46 @@ DTOs are used to transfer data between the client and server. Key DTOs include:
   - `private Long id`: The ID of the user.
   - `private String username`: The username of the user.
 
+#### UserCreateDTO
+- **Description:** Data Transfer Object (DTO) for creating a new user.
+- **Fields:**
+  - `private Long id`: The unique identifier of the user.
+  - `private String firstname`: The first name of the user.
+  - `private String lastname`: The last name of the user.
+  - `@Enumerated(EnumType.STRING) private Role role`: The role of the user.
+  - `@Enumerated(EnumType.STRING) private Status status`: The status of the user.
+  - `@NotBlank private String username`: The username of the user.
+  - `@NotBlank private String email`: The email of the user.
+  - `private String password`: The password of the user.
+  - `@Transient private String confirmPassword`: The confirmation password of the user.
+  - `@DateTimeFormat(pattern = "yyyy-MM-dd") private LocalDate birthDate`: The birthdate of the user.
+  - `private String country`: The country of the user.
+  - `private String city`: The city of the user.
+  - `private Boolean isActive`: Indicates whether the user is active.
+  - `private LocalDateTime createdAt`: The date and time the user was created.
+
+#### UserDTO
+- **Description:** Data Transfer Object (DTO) for user information.
+- **Fields:**
+  - `private Long id`: The ID of the user.
+  - `private String firstname`: The first name of the user.
+  - `private String lastname`: The last name of the user.
+  - `@Enumerated(EnumType.STRING) private Role role`: The role of the user.
+  - `@Enumerated(EnumType.STRING) private Status status`: The status of the user.
+  - `private String username`: The username of the user.
+  - `private String email`: The email of the user.
+
+#### UserUpdateDTO
+- **Description:** Data Transfer Object (DTO) for updating user information.
+- **Fields:**
+  - `private Long id`: The ID of the user.
+  - `private String firstname`: The first name of the user.
+  - `private String lastname`: The last name of the user.
+  - `@Enumerated(EnumType.STRING) private Role role`: The role of the user.
+  - `@Enumerated(EnumType.STRING) private Status status`: The status of the user.
+  - `private Boolean active`: Indicates whether the user is active.
+  - `private String username`: The username of the user.
+  - `private String email`: The email of the user.
 
 #### Repositories
 Repositories interact with the database to perform CRUD operations. Key repositories include:
@@ -1338,27 +1712,102 @@ Repositories interact with the database to perform CRUD operations. Key reposito
     - **Parameters:** `username` - the username of the user.
     - **Returns:** The user with the given username.
   - `User findTeacherIdByUsername(String username)`
-    - **Description:** Finds a teacher by their username.
+    - **Description:** Finds a teacher by the username.
     - **Parameters:** `username` - the username of the teacher.
     - **Returns:** The teacher with the given username.
   - `User findStudentIdByEmail(String email)`
-    - **Description:** Finds a student by their email.
+    - **Description:** Finds a student by the email.
     - **Parameters:** `email` - the email of the student.
     - **Returns:** The student with the given email.
   - `User findUserIdByUsername(String username)`
-    - **Description:** Finds a user by their username.
+    - **Description:** Finds a user by the username.
+    - **Parameters:** `username` - the username of the user.
+    - **Returns:** The user ID with the given username.
+  - `@Query("SELECT new gr.aueb.cf.schoolappspringbootmvc.dto.user.UserGetUsernameDTO(u.id, u.username) FROM User u WHERE u.id = :id") Optional<UserGetUsernameDTO> findUsernameById(Long id)`
+    - **Description:** Finds a username by the user ID.
+    - **Parameters:** `id` - the ID of the user.
+    - **Returns:** The username with the given ID.
+  - `User findUserByUsername(String username)`
+    - **Description:** Finds a user by the username.
     - **Parameters:** `username` - the username of the user.
     - **Returns:** The user with the given username.
-  - `@Query("SELECT new gr.aueb.cf.schoolappspringbootmvc.dto.user.UserGetUsernameDTO(u.id, u.username) FROM User u WHERE u.id = :id") Optional<UserGetUsernameDTO> findUsernameById(Long id)`
-    - **Description:** Finds a user by their ID.
+  - `User findUserByEmail(String email)`
+    - **Description:** Finds a user by the email.
+    - **Parameters:** `email` - the email of the user.
+    - **Returns:** The user with the given email.
+  - `User findUserById(Long id)`
+    - **Description:** Finds a user by the ID.
     - **Parameters:** `id` - the ID of the user.
-    - **Returns:** The username of the user with the given ID.
+    - **Returns:** The user with the given ID.
+  - `List<User> findUserByRole(Role role)`
+    - **Description:** Finds users by the role.
+    - **Parameters:** `role` - the role of the users.
+    - **Returns:** A list of users with the given role.
+  - `List<User> findUserByStatus(Status status)`
+    - **Description:** Finds users by the status.
+    - **Parameters:** `status` - the status of the users.
+    - **Returns:** A list of users with the given status.
+  - `@Modifying @Transactional @Query("DELETE FROM User u WHERE u.id = :id") void deleteById(@Param("id") Long id)`
+    - **Description:** Deletes a user by the ID.
+    - **Parameters:** `id` - the ID of the user to be deleted.
+  - `Boolean existsByUsername(String username)`
+    - **Description:** Checks if a user exists by the username.
+    - **Parameters:** `username` - the username of the user.
+    - **Returns:** `true` if a user with the given username exists, `false` otherwise.
+  - `@Query("SELECT u FROM User u LEFT JOIN u.teacher t LEFT JOIN u.student s LEFT JOIN u.admin a WHERE (:keyword IS NULL OR LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(CAST(u.role AS string)) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(CAST(u.status AS string)) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(t.firstname) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(t.lastname) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(s.firstname) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(s.lastname) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(a.firstname) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(a.lastname) LIKE LOWER(CONCAT('%', :keyword, '%'))) Page<User> searchUsers(@Param("keyword") String keyword, Pageable pageable)`
+    - **Description:** Searches for users by a keyword.
+    - **Parameters:** `keyword` - the keyword to search for, `pageable` - the pagination information.
+    - **Returns:** A paginated list of users that match the keyword.
 
 
 #### Mappers
 Mappers convert between DTOs and entities. The `Mapper` class includes methods like:
 
 ### Mapper Classes
+
+#### UserMapper
+- **Description:** Mapper for the `User` entity. Contains methods for converting `User` entities to various DTOs and vice versa.
+- **Methods:**
+  - `UserDTO mapUserToUserDTO(User user)`
+    - **Description:** Converts a `User` entity to a `UserDTO`.
+    - **Parameters:** `user` - The `User` entity to convert.
+    - **Returns:** The `UserDTO`.
+  - `User mapUserDTOToUser(UserDTO dto)`
+    - **Description:** Converts a `UserDTO` to a `User` entity.
+    - **Parameters:** `dto` - The `UserDTO` to convert.
+    - **Returns:** The `User` entity.
+  - `User mapUserUpdateDTOToUser(UserUpdateDTO userUpdateDTO)`
+    - **Description:** Converts a `UserUpdateDTO` to a `User` entity.
+    - **Parameters:** `userUpdateDTO` - The `UserUpdateDTO` to convert.
+    - **Returns:** The `User` entity.
+  - `UserUpdateDTO toUserUpdateDTO(User user)`
+    - **Description:** Converts a `User` entity to a `UserUpdateDTO`.
+    - **Parameters:** `user` - The `User` entity to convert.
+    - **Returns:** The `UserUpdateDTO`.
+  - `User updateUserFromDto(UserUpdateDTO dto, User user)`
+    - **Description:** Updates a `User` entity from a `UserUpdateDTO`.
+    - **Parameters:** `dto` - The `UserUpdateDTO`, `user` - The `User` entity to update.
+    - **Returns:** The updated `User` entity.
+  - `UserCreateDTO toUserCreateDTO(User user)`
+    - **Description:** Converts a `User` entity to a `UserCreateDTO`.
+    - **Parameters:** `user` - The `User` entity to convert.
+    - **Returns:** The `UserCreateDTO`.
+  - `User toUser(UserCreateDTO dto)`
+    - **Description:** Converts a `UserCreateDTO` to a `User` entity.
+    - **Parameters:** `dto` - The `UserCreateDTO` to convert.
+    - **Returns:** The `User` entity.
+  - `Teacher toTeacher(User user, UserCreateDTO dto)`
+    - **Description:** Converts a `User` entity and a `UserCreateDTO` to a `Teacher` entity.
+    - **Parameters:** `user` - The `User` entity, `dto` - The `UserCreateDTO`.
+    - **Returns:** The `Teacher` entity.
+  - `Student toStudent(User user, UserCreateDTO dto)`
+    - **Description:** Converts a `User` entity and a `UserCreateDTO` to a `Student` entity.
+    - **Parameters:** `user` - The `User` entity, `dto` - The `UserCreateDTO`.
+    - **Returns:** The `Student` entity.
+  - `Admin toAdmin(User user, UserCreateDTO dto)`
+    - **Description:** Converts a `User` entity and a `UserCreateDTO` to an `Admin` entity.
+    - **Parameters:** `user` - The `User` entity, `dto` - The `UserCreateDTO`.
+    - **Returns:** The `Admin` entity.
 
 #### AdminMapper
 - **Description:** Mapper for the `Admin` entity. Contains methods for converting an `Admin` entity to a DTO.
@@ -1368,6 +1817,10 @@ Mappers convert between DTOs and entities. The `Mapper` class includes methods l
     - **Parameters:** `admin` - The `Admin` entity to convert.
     - **Returns:** The `AdminGetAuthenticatedAdminDTO`.
     - **Throws:** `AdminNotFoundException` if the `Admin` entity is null.
+  - `Admin mapAdminDTOToAdmin(AdminUpdateDTO dto, Admin existingAdmin)`
+    - **Description:** Maps an `AdminUpdateDTO` to an existing `Admin` entity.
+    - **Parameters:** `dto` - The `AdminUpdateDTO` to map, `existingAdmin` - The existing `Admin` entity to update.
+    - **Returns:** The updated `Admin` entity.
 
 #### ClassroomMapper
 - **Description:** Mapper class for converting between Classroom-related DTOs and entities.
@@ -1808,6 +2261,35 @@ The application uses several JavaScript files to manage various client-side func
 - `fetchClassroomsByTeacherId(teacherId)`: Fetches classrooms for the teacher.
 - `populateUsernamesSelect(usernames)`: Populates a dropdown with usernames.
 - `createMessageToSelectedUser()`: Creates a message to the selected user.
+
+#### admin-create-user.js
+- **Description:** Handles the functionality for creating a new user through a modal form.
+- **Event Listeners:**
+  - `DOMContentLoaded`: Initializes the event listeners when the DOM content is fully loaded.
+  - `create-users-btn`: Shows the create user modal when the button is clicked.
+  - `createUserForm submit`: Handles form submission for creating a new user.
+- **Methods:**
+  - `fetch('/admin/create', {...})`: Sends a POST request to create a new user.
+  - `alert(data.message)`: Shows a success message after user creation.
+  - `alert('Error creating user: ' + error.message)`: Shows an error message if user creation fails.
+
+#### manage-users.js
+- **Description:** Handles the functionality for managing users, including loading, updating, and deleting users.
+- **Event Listeners:**
+  - `DOMContentLoaded`: Initializes the event listeners when the DOM content is fully loaded.
+  - `load-users-btn`: Loads the users when the button is clicked.
+  - `previous-page`: Loads the previous page of users.
+  - `next-page`: Loads the next page of users.
+  - `search-input input`: Loads the users based on the search query.
+- **Methods:**
+  - `loadUsers(page)`: Fetches and displays users based on the current page and search query.
+  - `openUpdateUserModal(userData)`: Opens the update user modal and populates it with user data.
+  - `handleUpdate(userId)`: Fetches user data and opens the update user modal.
+  - `handleDelete(userId)`: Deletes a user after confirmation.
+  - `fetch('/admin/search?${params.toString()}')`: Sends a GET request to search for users.
+  - `fetch('/admin/get/id/${userId}')`: Sends a GET request to get user data by ID.
+  - `fetch('/admin/update/${userId}', {...})`: Sends a PATCH request to update a user.
+  - `fetch('/admin/delete/${userId}', { method: 'DELETE' })`: Sends a DELETE request to delete a user.
 
 #### teachersNotification.js
 

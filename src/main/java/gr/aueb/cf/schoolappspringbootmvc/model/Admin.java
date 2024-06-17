@@ -48,7 +48,7 @@ public class Admin extends AbstractEntity {
      * It is cascaded to persist, update, and remove operations.
      */
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @Schema(description = "The user associated with this admin.")
     private User user;

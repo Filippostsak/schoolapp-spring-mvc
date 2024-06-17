@@ -4,7 +4,7 @@ import gr.aueb.cf.schoolappspringbootmvc.dto.student.RegisterStudentDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.student.SearchStudentToClassroomDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.student.StudentGetCurrentStudentDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.student.StudentGetUsernameAndIdDTO;
-import gr.aueb.cf.schoolappspringbootmvc.mapper.Mapper;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.UserMapper;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.StudentMapper;
 import gr.aueb.cf.schoolappspringbootmvc.model.Student;
 import gr.aueb.cf.schoolappspringbootmvc.model.User;
@@ -52,8 +52,8 @@ public class StudentServiceImpl implements IStudentService {
         Student student;
         User user;
         try {
-            student = Mapper.extractStudentFromRegisterStudentDTO(dto);
-            user = Mapper.extractUserFromRegisterStudentDTO(dto);
+            student = UserMapper.extractStudentFromRegisterStudentDTO(dto);
+            user = UserMapper.extractUserFromRegisterStudentDTO(dto);
             Optional<User> userOptional = userRepository.findByUsername(user.getUsername());
             if (userOptional.isPresent()) {
                 log.warn("Student with username: {} already exists", user.getUsername());

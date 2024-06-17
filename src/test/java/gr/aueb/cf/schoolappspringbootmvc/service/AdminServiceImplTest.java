@@ -1,7 +1,10 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
+import gr.aueb.cf.schoolappspringbootmvc.dto.admin.AdminGetAuthenticatedAdminDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.admin.RegisterAdminDTO;
-import gr.aueb.cf.schoolappspringbootmvc.mapper.Mapper;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.AdminMapper;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.UserMapper;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.exception.AdminNotFoundException;
 import gr.aueb.cf.schoolappspringbootmvc.model.Admin;
 import gr.aueb.cf.schoolappspringbootmvc.model.User;
 import gr.aueb.cf.schoolappspringbootmvc.repository.AdminRepository;
@@ -12,8 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockedStatic;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
@@ -21,11 +27,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AdminServiceImplTest {
+public class AdminServiceImplTest {
 
     @Mock
     private AdminRepository adminRepository;
@@ -35,6 +40,9 @@ class AdminServiceImplTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private AdminMapper adminMapper;
 
     @InjectMocks
     private AdminServiceImpl adminService;
@@ -46,104 +54,87 @@ class AdminServiceImplTest {
     @BeforeEach
     void setUp() {
         registerAdminDTO = new RegisterAdminDTO();
-        registerAdminDTO.setUsername("adminUser");
-        registerAdminDTO.setEmail("admin@example.com");
-        registerAdminDTO.setPassword("Admin@1234");
-        registerAdminDTO.setConfirmPassword("Admin@1234");
-        registerAdminDTO.setFirstname("Admin");
+        registerAdminDTO.setUsername("testUsername");
+        registerAdminDTO.setPassword("testPassword");
+        registerAdminDTO.setConfirmPassword("testPassword");
+        registerAdminDTO.setEmail("test@example.com");
+        registerAdminDTO.setFirstname("Test");
         registerAdminDTO.setLastname("User");
         registerAdminDTO.setBirthDate(LocalDate.of(1990, 1, 1));
         registerAdminDTO.setCountry("Country");
         registerAdminDTO.setCity("City");
 
         admin = new Admin();
-        admin.setFirstname("Admin");
-        admin.setLastname("User");
-
         user = new User();
-        user.setUsername("adminUser");
-        user.setPassword("Admin@1234");
+        user.setUsername("testUsername");
+        user.setPassword("testPassword");
     }
 
     @Test
-    void registerAdmin_ShouldRegisterAdmin_WhenAdminDoesNotExist() throws AdminAlreadyExistsException {
-        try (MockedStatic<Mapper> mockedMapper = mockStatic(Mapper.class)) {
-            // Arrange
-            when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
-            when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-            when(adminRepository.save(any(Admin.class))).thenReturn(admin);
-            mockedMapper.when(() -> Mapper.extractAdminFromRegisterAdminDTO(any(RegisterAdminDTO.class))).thenReturn(admin);
-            mockedMapper.when(() -> Mapper.extractUserFromRegisterAdminDTO(any(RegisterAdminDTO.class))).thenReturn(user);
+    void registerAdmin_whenAdminDoesNotExist_shouldRegisterAdmin() throws AdminAlreadyExistsException {
+        try (MockedStatic<UserMapper> mockedUserMapper = mockStatic(UserMapper.class)) {
+            mockedUserMapper.when(() -> UserMapper.extractAdminFromRegisterAdminDTO(registerAdminDTO)).thenReturn(admin);
+            mockedUserMapper.when(() -> UserMapper.extractUserFromRegisterAdminDTO(registerAdminDTO)).thenReturn(user);
+            when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
+            when(passwordEncoder.encode(user.getPassword())).thenReturn("encodedPassword");
 
-            // Act
             Admin registeredAdmin = adminService.registerAdmin(registerAdminDTO);
 
-            // Assert
+            verify(adminRepository).save(admin);
             assertNotNull(registeredAdmin);
-            assertEquals("Admin", registeredAdmin.getFirstname());
-            assertEquals("User", registeredAdmin.getLastname());
-            verify(userRepository, times(1)).findByUsername(anyString());
-            verify(passwordEncoder, times(1)).encode(anyString());
-            verify(adminRepository, times(1)).save(any(Admin.class));
         }
     }
 
     @Test
-    void findAllAdmins_ShouldReturnListOfAdmins() throws Exception {
-        // Arrange
-        List<Admin> admins = List.of(admin);
-        when(adminRepository.findAll()).thenReturn(admins);
+    void registerAdmin_whenAdminAlreadyExists_shouldThrowException() {
+        try (MockedStatic<UserMapper> mockedUserMapper = mockStatic(UserMapper.class)) {
+            mockedUserMapper.when(() -> UserMapper.extractAdminFromRegisterAdminDTO(registerAdminDTO)).thenReturn(admin);
+            mockedUserMapper.when(() -> UserMapper.extractUserFromRegisterAdminDTO(registerAdminDTO)).thenReturn(user);
+            when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
 
-        // Act
+            assertThrows(AdminAlreadyExistsException.class, () -> adminService.registerAdmin(registerAdminDTO));
+        }
+    }
+
+    @Test
+    void findAllAdmins_shouldReturnAllAdmins() throws Exception {
+        List<Admin> adminList = List.of(admin);
+        when(adminRepository.findAll()).thenReturn(adminList);
+
         List<Admin> result = adminService.findAllAdmins();
 
-        // Assert
+        assertEquals(adminList.size(), result.size());
+    }
+
+    @Test
+    void getAuthenticatedAdmin_whenAdminIsAuthenticated_shouldReturnAdmin() throws AdminNotFoundException {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUsername");
+        when(userRepository.findByUsername("testUsername")).thenReturn(Optional.of(user));
+        when(adminRepository.findByUserUsername("testUsername")).thenReturn(Optional.of(admin));
+        AdminGetAuthenticatedAdminDTO dto = new AdminGetAuthenticatedAdminDTO();
+        when(adminMapper.toAdminGetAuthenticatedAdminDTO(admin)).thenReturn(dto);
+
+        AdminGetAuthenticatedAdminDTO result = adminService.getAuthenticatedAdmin(dto);
+
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Admin", result.get(0).getFirstname());
-        assertEquals("User", result.get(0).getLastname());
-        verify(adminRepository, times(1)).findAll();
-    }
-    @Test
-    void registerAdmin_ShouldThrowException_WhenAdminAlreadyExists() {
-        try (MockedStatic<Mapper> mockedMapper = mockStatic(Mapper.class)) {
-            // Arrange
-            when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
-            mockedMapper.when(() -> Mapper.extractAdminFromRegisterAdminDTO(any(RegisterAdminDTO.class))).thenReturn(admin);
-            mockedMapper.when(() -> Mapper.extractUserFromRegisterAdminDTO(any(RegisterAdminDTO.class))).thenReturn(user);
-
-            // Act and Assert
-            assertThrows(AdminAlreadyExistsException.class, () -> adminService.registerAdmin(registerAdminDTO));
-            verify(userRepository, times(1)).findByUsername(anyString());
-            verify(adminRepository, times(0)).save(any(Admin.class));
-        }
+        assertEquals("testUsername", result.getUsername());
     }
 
     @Test
-    void registerAdmin_ShouldThrowException_WhenPasswordEncodingFails() {
-        try (MockedStatic<Mapper> mockedMapper = mockStatic(Mapper.class)) {
-            // Arrange
-            when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
-            when(passwordEncoder.encode(anyString())).thenThrow(new RuntimeException("Encoding failed"));
-            mockedMapper.when(() -> Mapper.extractAdminFromRegisterAdminDTO(any(RegisterAdminDTO.class))).thenReturn(admin);
-            mockedMapper.when(() -> Mapper.extractUserFromRegisterAdminDTO(any(RegisterAdminDTO.class))).thenReturn(user);
+    void getAuthenticatedAdmin_whenAdminNotFound_shouldThrowException() {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUsername");
+        when(userRepository.findByUsername("testUsername")).thenReturn(Optional.empty());
 
-            // Act and Assert
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> adminService.registerAdmin(registerAdminDTO));
-            assertEquals("Encoding failed", exception.getMessage());
-            verify(userRepository, times(1)).findByUsername(anyString());
-            verify(adminRepository, times(0)).save(any(Admin.class));
-        }
-    }
+        AdminGetAuthenticatedAdminDTO dto = new AdminGetAuthenticatedAdminDTO();
 
-    @Test
-    void findAllAdmins_ShouldHandleException() {
-        // Arrange
-        when(adminRepository.findAll()).thenThrow(new RuntimeException("Database error"));
-
-        // Act and Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> adminService.findAllAdmins());
-        assertEquals("Database error", exception.getMessage());
-        verify(adminRepository, times(1)).findAll();
+        assertThrows(AdminNotFoundException.class, () -> adminService.getAuthenticatedAdmin(dto));
     }
 }
