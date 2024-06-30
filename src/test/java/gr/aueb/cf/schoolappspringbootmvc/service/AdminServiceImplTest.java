@@ -1,6 +1,7 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
 import gr.aueb.cf.schoolappspringbootmvc.dto.admin.AdminGetAuthenticatedAdminDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.admin.AdminUpdateDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.admin.RegisterAdminDTO;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.AdminMapper;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.UserMapper;
@@ -15,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -136,5 +137,64 @@ public class AdminServiceImplTest {
         AdminGetAuthenticatedAdminDTO dto = new AdminGetAuthenticatedAdminDTO();
 
         assertThrows(AdminNotFoundException.class, () -> adminService.getAuthenticatedAdmin(dto));
+    }
+
+    @Test
+    void deleteCurrentAdmin_whenAdminExists_shouldDeleteAdmin() {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUsername");
+        when(userRepository.findByUsername("testUsername")).thenReturn(Optional.of(user));
+        when(adminRepository.findByUserUsername("testUsername")).thenReturn(Optional.of(admin));
+
+        adminService.deleteCurrentAdmin();
+
+        verify(adminRepository).delete(admin);
+        verify(userRepository).delete(user);
+    }
+
+    @Test
+    void deleteCurrentAdmin_whenAdminNotFound_shouldThrowException() {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUsername");
+        when(userRepository.findByUsername("testUsername")).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> adminService.deleteCurrentAdmin());
+    }
+
+    @Test
+    void updateAdmin_whenAdminExists_shouldUpdateAdmin() {
+        AdminUpdateDTO updateDTO = new AdminUpdateDTO("Firstname", "Lastname", "username", "email@example.com", "Password1@", LocalDate.now(), "Country", "City");
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUsername");
+        when(userRepository.findByUsername("testUsername")).thenReturn(Optional.of(user));
+        when(adminRepository.findByUserUsername("testUsername")).thenReturn(Optional.of(admin));
+        when(adminMapper.mapAdminDTOToAdmin(updateDTO, admin)).thenReturn(admin);
+
+        adminService.updateAdmin(updateDTO);
+
+        verify(adminRepository).save(admin);
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void updateAdmin_whenAdminNotFound_shouldThrowException() {
+        AdminUpdateDTO updateDTO = new AdminUpdateDTO("Firstname", "Lastname", "username", "email@example.com", "Password1@", LocalDate.now(), "Country", "City");
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUsername");
+        when(userRepository.findByUsername("testUsername")).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> adminService.updateAdmin(updateDTO));
     }
 }

@@ -122,22 +122,24 @@ public class AdminServiceImpl implements IAdminService {
 
     @Override
     public void deleteCurrentAdmin() {
-        try{
+        try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             Optional<User> userOptional = userRepository.findByUsername(username);
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-                Admin admin = adminRepository.findByUserUsername(username).orElseThrow(() -> new AdminNotFoundException(username));
-                adminRepository.delete(admin);
-                log.info("Admin with username {} deleted", username);
-                userRepository.delete(user);
+            if (userOptional.isEmpty()) {
+                throw new AdminNotFoundException(username);
             }
+            User user = userOptional.get();
+            Admin admin = adminRepository.findByUserUsername(username).orElseThrow(() -> new AdminNotFoundException(username));
+            adminRepository.delete(admin);
+            log.info("Admin with username {} deleted", username);
+            userRepository.delete(user);
         } catch (Exception e) {
             log.error("An error occurred while deleting the authenticated admin: {}", e.getMessage());
-            throw new RuntimeException("An error occurred while deleting the authenticated admin.");
+            throw new RuntimeException("An error occurred while deleting the authenticated admin.", e);
         }
     }
+
 
     /**
      * Updates the currently authenticated admin.

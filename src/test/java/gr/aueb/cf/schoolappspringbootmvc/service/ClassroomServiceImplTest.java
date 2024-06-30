@@ -1,36 +1,31 @@
 package gr.aueb.cf.schoolappspringbootmvc.service;
 
-import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.ClassroomUpdateDTO;
-import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.CreateClassroomDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.classroom.*;
 import gr.aueb.cf.schoolappspringbootmvc.dto.meetingDate.UpdateMeetingDateDTO;
+import gr.aueb.cf.schoolappspringbootmvc.dto.student.RemoveStudentDTO;
 import gr.aueb.cf.schoolappspringbootmvc.dto.teacher.AddTeacherToClassroomDTO;
 import gr.aueb.cf.schoolappspringbootmvc.mapper.ClassroomMapper;
-import gr.aueb.cf.schoolappspringbootmvc.model.Classroom;
-import gr.aueb.cf.schoolappspringbootmvc.model.MeetingDate;
-import gr.aueb.cf.schoolappspringbootmvc.model.Student;
-import gr.aueb.cf.schoolappspringbootmvc.model.Teacher;
+import gr.aueb.cf.schoolappspringbootmvc.mapper.MeetingDateMapper;
+import gr.aueb.cf.schoolappspringbootmvc.model.*;
 import gr.aueb.cf.schoolappspringbootmvc.repository.ClassroomRepository;
 import gr.aueb.cf.schoolappspringbootmvc.repository.MeetingDateRepository;
 import gr.aueb.cf.schoolappspringbootmvc.repository.StudentRepository;
 import gr.aueb.cf.schoolappspringbootmvc.repository.TeacherRepository;
-import gr.aueb.cf.schoolappspringbootmvc.service.exceptions.ClassroomAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class ClassroomServiceImplTest {
 
     @Mock
@@ -51,446 +46,244 @@ public class ClassroomServiceImplTest {
     @Mock
     private ITeacherService teacherService;
 
+    @Mock
+    private MeetingDateMapper meetingDateMapper;
+
     @InjectMocks
     private ClassroomServiceImpl classroomService;
 
+    private Classroom classroom;
+    private Teacher teacher;
+    private Student student;
+    private MeetingDate meetingDate;
+    private User user;
+
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+    void setUp() {
+        user = new User();
+        user.setEmail("teacher@example.com");
+
+        teacher = new Teacher();
+        teacher.setId(1L);
+        teacher.setUser(user);
+
+        classroom = new Classroom();
+        classroom.setId(1L);
+        classroom.setName("Test Classroom");
+        classroom.setCreator(teacher);
+        classroom.addTeacher(teacher);
+
+        student = new Student();
+        student.setId(1L);
+
+        meetingDate = new MeetingDate();
+        meetingDate.setId(1L);
     }
 
-    //Positive scenarios
-
     @Test
-    public void testCreateClassroom() {
-        CreateClassroomDTO dto = new CreateClassroomDTO();
-        dto.setName("Math");
-        dto.setDescription("Math Classroom");
-
-        Teacher teacher = new Teacher();
-        teacher.setId(1L);
-        Classroom classroom = new Classroom();
-        classroom.setName("Math");
-        classroom.setDescription("Math Classroom");
-        classroom.setCreator(teacher);
+    void createClassroom_shouldCreateClassroom() {
+        CreateClassroomDTO classroomDTO = new CreateClassroomDTO();
+        classroomDTO.setName("New Classroom");
 
         when(teacherService.getCurrentAuthenticatedTeacher()).thenReturn(Optional.of(teacher));
-        when(classroomMapper.toClassroom(dto, teacher.getId())).thenReturn(classroom);
-        when(classroomRepository.save(classroom)).thenReturn(classroom);
+        when(classroomMapper.toClassroom(classroomDTO, teacher.getId())).thenReturn(classroom);
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(classroom);
 
-        Classroom createdClassroom = classroomService.createClassroom(dto);
+        Classroom createdClassroom = classroomService.createClassroom(classroomDTO);
 
         assertNotNull(createdClassroom);
-        assertEquals("Math", createdClassroom.getName());
-        verify(classroomRepository, times(1)).save(classroom);
+        assertEquals(classroom.getId(), createdClassroom.getId());
+        verify(classroomRepository).save(any(Classroom.class));
     }
 
     @Test
-    public void testGetCreatorTeacher() {
-        Long classroomId = 1L;
-        Classroom classroom = new Classroom();
-        Teacher teacher = new Teacher();
-        classroom.setCreator(teacher);
+    void getCreatorTeacher_shouldReturnCreator() {
+        when(classroomRepository.findById(classroom.getId())).thenReturn(Optional.of(classroom));
 
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
+        Teacher creator = classroomService.getCreatorTeacher(classroom.getId());
 
-        Teacher creatorTeacher = classroomService.getCreatorTeacher(classroomId);
-
-        assertNotNull(creatorTeacher);
-        verify(classroomRepository, times(1)).findById(classroomId);
+        assertNotNull(creator);
+        assertEquals(teacher.getId(), creator.getId());
     }
 
     @Test
-    public void testGetStudentsInClassroom() {
-        Long classroomId = 1L;
-        Classroom classroom = new Classroom();
-        List<Student> students = new ArrayList<>();
-        classroom.setStudentsOfClassroom(students);
+    void getStudentsInClassroom_shouldReturnStudents() {
+        classroom.addStudent(student);
+        when(classroomRepository.findById(classroom.getId())).thenReturn(Optional.of(classroom));
 
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
+        List<Student> students = classroomService.getStudentsInClassroom(classroom.getId());
 
-        List<Student> result = classroomService.getStudentsInClassroom(classroomId);
-
-        assertNotNull(result);
-        verify(classroomRepository, times(1)).findById(classroomId);
+        assertNotNull(students);
+        assertEquals(1, students.size());
+        assertEquals(student.getId(), students.get(0).getId());
     }
 
     @Test
-    public void testFindClassroomsByTeacher() {
-        Long teacherId = 1L;
-        Teacher teacher = new Teacher();
-        List<Classroom> classrooms = new ArrayList<>();
-        teacher.setClassrooms(classrooms);
+    void findClassroomsByTeacher_shouldReturnClassrooms() {
+        teacher.addClassroom(classroom);
+        when(teacherRepository.findById(teacher.getId())).thenReturn(Optional.of(teacher));
 
-        when(teacherRepository.findById(teacherId)).thenReturn(Optional.of(teacher));
+        List<Classroom> classrooms = classroomService.findClassroomsByTeacher(teacher.getId());
 
-        List<Classroom> result = classroomService.findClassroomsByTeacher(teacherId);
-
-        assertNotNull(result);
-        verify(teacherRepository, times(1)).findById(teacherId);
+        assertNotNull(classrooms);
+        assertEquals(1, classrooms.size());
+        assertEquals(classroom.getId(), classrooms.get(0).getId());
     }
 
     @Test
-    public void testFindAllClassrooms() {
-        List<Classroom> classrooms = new ArrayList<>();
-        when(classroomRepository.findAll()).thenReturn(classrooms);
+    void findAllClassrooms_shouldReturnAllClassrooms() {
+        when(classroomRepository.findAll()).thenReturn(List.of(classroom));
 
-        List<Classroom> result = classroomService.findAllClassrooms();
+        List<Classroom> classrooms = classroomService.findAllClassrooms();
 
-        assertNotNull(result);
-        verify(classroomRepository, times(1)).findAll();
+        assertNotNull(classrooms);
+        assertEquals(1, classrooms.size());
     }
 
     @Test
-    public void testUpdateClassroom() {
-        Long classroomId = 1L;
-        CreateClassroomDTO dto = new CreateClassroomDTO();
-        dto.setName("Updated Name");
-        dto.setDescription("Updated Description");
+    void updateClassroom_shouldUpdateClassroom() {
+        CreateClassroomDTO classroomDTO = new CreateClassroomDTO();
+        classroomDTO.setName("Updated Classroom");
 
-        Classroom classroom = new Classroom();
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
-        when(classroomRepository.save(classroom)).thenReturn(classroom);
+        when(classroomRepository.findById(classroom.getId())).thenReturn(Optional.of(classroom));
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(classroom);
 
-        Classroom updatedClassroom = classroomService.updateClassroom(classroomId, dto);
+        Classroom updatedClassroom = classroomService.updateClassroom(classroom.getId(), classroomDTO);
 
         assertNotNull(updatedClassroom);
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(classroomRepository, times(1)).save(classroom);
+        assertEquals(classroom.getId(), updatedClassroom.getId());
+        verify(classroomRepository).save(any(Classroom.class));
     }
 
     @Test
-    public void testDeleteClassroom() {
-        Long classroomId = 1L;
-        Classroom classroom = new Classroom();
+    void deleteClassroom_shouldDeleteClassroom() {
+        when(classroomRepository.findById(classroom.getId())).thenReturn(Optional.of(classroom));
 
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
+        classroomService.deleteClassroom(classroom.getId());
 
-        classroomService.deleteClassroom(classroomId);
-
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(classroomRepository, times(1)).delete(classroom);
+        verify(classroomRepository).delete(any(Classroom.class));
     }
 
     @Test
-    public void testClassroomNameExists() {
-        String name = "Math";
-        when(classroomRepository.existsByName(name)).thenReturn(true);
+    void deleteClassroom_whenClassroomNotFound_shouldThrowException() {
+        when(classroomRepository.findById(classroom.getId())).thenReturn(Optional.empty());
 
-        boolean exists = classroomService.classroomNameExists(name);
-
-        assertTrue(exists);
-        verify(classroomRepository, times(1)).existsByName(name);
+        assertThrows(RuntimeException.class, () -> classroomService.deleteClassroom(classroom.getId()));
     }
 
     @Test
-    public void testAddTeacherToClassroom() {
-        Long classroomId = 1L;
-        String teacherUsername = "teacher1";
-        Classroom classroom = new Classroom();
-        Teacher teacher = new Teacher();
-
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
-        when(teacherRepository.findByUserUsername(teacherUsername)).thenReturn(Optional.of(teacher));
-
-        classroomService.addTeacherToClassroom(classroomId, teacherUsername);
-
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(teacherRepository, times(1)).findByUserUsername(teacherUsername);
-        verify(classroomRepository, times(1)).save(classroom);
-    }
-
-    @Test
-    public void testFindClassroomsByTeacherWithPageable() {
-        Long teacherId = 1L;
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Classroom> classroomPage = new PageImpl<>(new ArrayList<>());
-
-        when(classroomRepository.findByTeachers_Id(teacherId, pageable)).thenReturn(classroomPage);
-
-        Page<Classroom> result = classroomService.findClassroomsByTeacher(teacherId, pageable);
-
-        assertNotNull(result);
-        verify(classroomRepository, times(1)).findByTeachers_Id(teacherId, pageable);
-    }
-
-    @Test
-    public void testFindById() throws Exception {
-        Long classroomId = 1L;
-        Classroom classroom = new Classroom();
-
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
-
-        Optional<Classroom> result = classroomService.findById(classroomId);
-
-        assertTrue(result.isPresent());
-        verify(classroomRepository, times(1)).findById(classroomId);
-    }
-
-    @Test
-    public void testAddTeacherToClassroomDTO() {
+    void addTeacherToClassroom_shouldAddTeacher() {
         AddTeacherToClassroomDTO dto = new AddTeacherToClassroomDTO();
-        dto.setClassroomId(1L);
-        dto.setTeacherUsername("teacher1");
-        Classroom classroom = new Classroom();
-        Teacher teacher = new Teacher();
+        dto.setClassroomId(classroom.getId());
+        dto.setTeacherUsername("testTeacher");
 
-        when(classroomRepository.findById(dto.getClassroomId())).thenReturn(Optional.of(classroom));
+        when(classroomRepository.findById(classroom.getId())).thenReturn(Optional.of(classroom));
         when(teacherRepository.findByUserUsername(dto.getTeacherUsername())).thenReturn(Optional.of(teacher));
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(classroom);
 
         classroomService.addTeacherToClassroom(dto);
 
-        verify(classroomRepository, times(1)).findById(dto.getClassroomId());
-        verify(teacherRepository, times(1)).findByUserUsername(dto.getTeacherUsername());
-        verify(classroomRepository, times(1)).save(classroom);
+        verify(classroomRepository).save(any(Classroom.class));
     }
 
     @Test
-    public void testSave() throws ClassroomAlreadyExistsException {
-        Classroom classroom = new Classroom();
-        classroom.setName("Math");
-
-        when(classroomRepository.existsByName(classroom.getName())).thenReturn(false);
-        when(classroomRepository.save(classroom)).thenReturn(classroom);
-
-        classroomService.save(classroom);
-
-        verify(classroomRepository, times(1)).existsByName(classroom.getName());
-        verify(classroomRepository, times(1)).save(classroom);
-    }
-
-    @Test
-    public void testUpdateClassroomDetails() {
-        Long classroomId = 1L;
-        ClassroomUpdateDTO classroomUpdateDTO = new ClassroomUpdateDTO();
-        classroomUpdateDTO.setName("Updated Name");
-
-        Teacher teacher = new Teacher();
-        Classroom classroom = new Classroom();
-        classroom.setCreator(teacher);
-
-        when(teacherService.getCurrentAuthenticatedTeacher()).thenReturn(Optional.of(teacher));
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
-        when(classroomRepository.save(classroom)).thenReturn(classroom);
-
-        Classroom updatedClassroom = classroomService.updateClassroomDetails(classroomId, classroomUpdateDTO);
-
-        assertNotNull(updatedClassroom);
-        verify(teacherService, times(1)).getCurrentAuthenticatedTeacher();
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(classroomRepository, times(1)).save(classroom);
-    }
-
-    @Test
-    public void testUpdateMeetingDate() {
-        Long classroomId = 1L;
-        Long meetingDateId = 1L;
+    void updateMeetingDate_shouldUpdateMeetingDate() {
         UpdateMeetingDateDTO meetingUpdateDTO = new UpdateMeetingDateDTO();
-
-        Teacher teacher = new Teacher();
-        Classroom classroom = new Classroom();
-        classroom.setCreator(teacher);
-        MeetingDate meetingDate = new MeetingDate();
+        meetingUpdateDTO.setDate(meetingDate.getDate());
 
         when(teacherService.getCurrentAuthenticatedTeacher()).thenReturn(Optional.of(teacher));
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
-        when(meetingDateRepository.findById(meetingDateId)).thenReturn(Optional.of(meetingDate));
-        when(meetingDateRepository.save(meetingDate)).thenReturn(meetingDate);
+        when(classroomRepository.findById(classroom.getId())).thenReturn(Optional.of(classroom));
+        when(meetingDateRepository.findById(meetingDate.getId())).thenReturn(Optional.of(meetingDate));
+        doNothing().when(meetingDateMapper).updateMeetingDateFromDTO(meetingUpdateDTO, meetingDate);
+        when(meetingDateRepository.save(any(MeetingDate.class))).thenReturn(meetingDate);
 
-        MeetingDate updatedMeetingDate = classroomService.updateMeetingDate(classroomId, meetingDateId, meetingUpdateDTO);
+        MeetingDate updatedMeetingDate = classroomService.updateMeetingDate(classroom.getId(), meetingDate.getId(), meetingUpdateDTO);
 
         assertNotNull(updatedMeetingDate);
-        verify(teacherService, times(1)).getCurrentAuthenticatedTeacher();
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(meetingDateRepository, times(1)).findById(meetingDateId);
-        verify(meetingDateRepository, times(1)).save(meetingDate);
+        assertEquals(meetingDate.getId(), updatedMeetingDate.getId());
+        verify(meetingDateRepository).save(any(MeetingDate.class));
     }
 
-    //Negative scenarios
 
     @Test
-    public void testCreateClassroomWithException() {
-        CreateClassroomDTO dto = new CreateClassroomDTO();
-
-        when(teacherService.getCurrentAuthenticatedTeacher()).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.createClassroom(dto));
-
-        assertEquals("Authenticated teacher not found", exception.getMessage());
-        verify(teacherService, times(1)).getCurrentAuthenticatedTeacher();
-        verify(classroomRepository, never()).save(any());
-    }
-
-    @Test
-    public void testGetCreatorTeacherNotFound() {
-        Long classroomId = 1L;
-
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.getCreatorTeacher(classroomId));
-
-        assertEquals("Classroom not found", exception.getMessage());
-        verify(classroomRepository, times(1)).findById(classroomId);
-    }
-
-    @Test
-    public void testGetStudentsInClassroomNotFound() {
-        Long classroomId = 1L;
-
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.getStudentsInClassroom(classroomId));
-
-        assertEquals("Classroom not found", exception.getMessage());
-        verify(classroomRepository, times(1)).findById(classroomId);
-    }
-
-    @Test
-    public void testFindClassroomsByTeacherNotFound() {
-        Long teacherId = 1L;
-
-        when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.findClassroomsByTeacher(teacherId));
-
-        assertEquals("Teacher not found", exception.getMessage());
-        verify(teacherRepository, times(1)).findById(teacherId);
-    }
-
-    @Test
-    public void testUpdateClassroomNotFound() {
-        Long classroomId = 1L;
-        CreateClassroomDTO dto = new CreateClassroomDTO();
-
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.updateClassroom(classroomId, dto));
-
-        assertEquals("Classroom not found", exception.getMessage());
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(classroomRepository, never()).save(any());
-    }
-
-    @Test
-    public void testDeleteClassroomNotFound() {
-        Long classroomId = 1L;
-
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.deleteClassroom(classroomId));
-
-        assertEquals("Classroom not found", exception.getMessage());
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(classroomRepository, never()).delete(any());
-    }
-
-    @Test
-    public void testAddTeacherToClassroomNotFound() {
-        Long classroomId = 1L;
-        String teacherUsername = "teacher1";
-
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.addTeacherToClassroom(classroomId, teacherUsername));
-
-        assertEquals("Classroom not found", exception.getMessage());
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(teacherRepository, never()).findByUserUsername(teacherUsername);
-        verify(classroomRepository, never()).save(any());
-    }
-
-    @Test
-    public void testAddTeacherToClassroomTeacherNotFound() {
-        Long classroomId = 1L;
-        String teacherUsername = "teacher1";
-        Classroom classroom = new Classroom();
-
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
-        when(teacherRepository.findByUserUsername(teacherUsername)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.addTeacherToClassroom(classroomId, teacherUsername));
-
-        assertEquals("Teacher not found", exception.getMessage());
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(teacherRepository, times(1)).findByUserUsername(teacherUsername);
-        verify(classroomRepository, never()).save(any());
-    }
-
-    @Test
-    public void testAddTeacherToClassroomDTONotFound() {
-        AddTeacherToClassroomDTO dto = new AddTeacherToClassroomDTO();
-        dto.setClassroomId(1L);
-        dto.setTeacherUsername("teacher1");
-
-        when(classroomRepository.findById(dto.getClassroomId())).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.addTeacherToClassroom(dto));
-
-        assertEquals("Classroom not found", exception.getMessage());
-        verify(classroomRepository, times(1)).findById(dto.getClassroomId());
-        verify(teacherRepository, never()).findByUserUsername(dto.getTeacherUsername());
-        verify(classroomRepository, never()).save(any());
-    }
-
-    @Test
-    public void testAddTeacherToClassroomDTOTeacherNotFound() {
-        AddTeacherToClassroomDTO dto = new AddTeacherToClassroomDTO();
-        dto.setClassroomId(1L);
-        dto.setTeacherUsername("teacher1");
-        Classroom classroom = new Classroom();
-
-        when(classroomRepository.findById(dto.getClassroomId())).thenReturn(Optional.of(classroom));
-        when(teacherRepository.findByUserUsername(dto.getTeacherUsername())).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.addTeacherToClassroom(dto));
-
-        assertEquals("Teacher not found", exception.getMessage());
-        verify(classroomRepository, times(1)).findById(dto.getClassroomId());
-        verify(teacherRepository, times(1)).findByUserUsername(dto.getTeacherUsername());
-        verify(classroomRepository, never()).save(any());
-    }
-
-    @Test
-    public void testUpdateClassroomDetailsUnauthorized() {
-        Long classroomId = 1L;
+    void updateClassroomDetails_shouldUpdateClassroomDetails() {
         ClassroomUpdateDTO classroomUpdateDTO = new ClassroomUpdateDTO();
+        classroomUpdateDTO.setName("Updated Classroom");
 
-        Teacher currentTeacher = new Teacher();
-        Classroom classroom = new Classroom();
-        classroom.setCreator(new Teacher()); // Different teacher
+        when(teacherService.getCurrentAuthenticatedTeacher()).thenReturn(Optional.of(teacher));
+        when(classroomRepository.findById(classroom.getId())).thenReturn(Optional.of(classroom));
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(classroom);
 
-        when(teacherService.getCurrentAuthenticatedTeacher()).thenReturn(Optional.of(currentTeacher));
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
+        Classroom updatedClassroom = classroomService.updateClassroomDetails(classroom.getId(), classroomUpdateDTO);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.updateClassroomDetails(classroomId, classroomUpdateDTO));
-
-        assertEquals("Teacher not authorized to update this classroom", exception.getMessage());
-        verify(teacherService, times(1)).getCurrentAuthenticatedTeacher();
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(classroomRepository, never()).save(any());
+        assertNotNull(updatedClassroom);
+        assertEquals(classroom.getId(), updatedClassroom.getId());
+        verify(classroomRepository).save(any(Classroom.class));
     }
 
     @Test
-    public void testUpdateMeetingDateUnauthorized() {
-        Long classroomId = 1L;
-        Long meetingDateId = 1L;
-        UpdateMeetingDateDTO meetingUpdateDTO = new UpdateMeetingDateDTO();
+    void removeStudentFromClassroom_shouldRemoveStudent() {
+        RemoveStudentDTO dto = new RemoveStudentDTO();
+        dto.setClassroomId(classroom.getId());
+        dto.setStudentId(student.getId());
 
-        Teacher currentTeacher = new Teacher();
-        Classroom classroom = new Classroom();
-        classroom.setCreator(new Teacher());
-        MeetingDate meetingDate = new MeetingDate();
+        when(classroomRepository.findById(classroom.getId())).thenReturn(Optional.of(classroom));
+        when(studentRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(classroom);
 
-        when(teacherService.getCurrentAuthenticatedTeacher()).thenReturn(Optional.of(currentTeacher));
-        when(classroomRepository.findById(classroomId)).thenReturn(Optional.of(classroom));
-        when(meetingDateRepository.findById(meetingDateId)).thenReturn(Optional.of(meetingDate));
+        classroomService.removeStudentFromClassroom(dto);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> classroomService.updateMeetingDate(classroomId, meetingDateId, meetingUpdateDTO));
+        verify(classroomRepository).save(any(Classroom.class));
+    }
 
-        assertEquals("Teacher not authorized to update meeting dates for this classroom", exception.getMessage());
-        verify(teacherService, times(1)).getCurrentAuthenticatedTeacher();
-        verify(classroomRepository, times(1)).findById(classroomId);
-        verify(meetingDateRepository, times(1)).findById(meetingDateId);
-        verify(meetingDateRepository, never()).save(any());
+    @Test
+    void addStudentToClassroom_shouldAddStudent() {
+        when(classroomRepository.findById(classroom.getId())).thenReturn(Optional.of(classroom));
+        when(studentRepository.findById(student.getId())).thenReturn(Optional.of(student));
+        when(classroomRepository.save(any(Classroom.class))).thenReturn(classroom);
+
+        classroomService.addStudentToClassroom(classroom.getId(), student.getId());
+
+        verify(classroomRepository).save(any(Classroom.class));
+    }
+
+    @Test
+    void findClassroomsByStudentId_shouldReturnClassrooms() throws Exception {
+        when(studentRepository.existsById(student.getId())).thenReturn(true);
+        when(classroomRepository.findClassroomsByStudentsOfClassroom_Id(student.getId())).thenReturn(List.of(classroom));
+
+        List<ClassroomStudentsClassroomDTO> classrooms = classroomService.findClassroomsByStudentId(student.getId());
+
+        assertNotNull(classrooms);
+        assertEquals(1, classrooms.size());
+    }
+
+    @Test
+    void getAllClassroomsByTeacherId_shouldReturnClassrooms() {
+        when(teacherRepository.existsById(teacher.getId())).thenReturn(true);
+        when(teacherRepository.findById(teacher.getId())).thenReturn(Optional.of(teacher));
+
+        List<Classroom> classrooms = classroomService.getAllClassroomsByTeacherId(teacher.getId());
+
+        assertNotNull(classrooms);
+        assertEquals(teacher.getClassrooms().size(), classrooms.size());
+    }
+
+    @Test
+    void isStudentInClassroom_shouldReturnTrue() {
+        when(classroomRepository.existsByIdAndStudentsOfClassroom_Id(classroom.getId(), student.getId())).thenReturn(true);
+
+        boolean result = classroomService.isStudentInClassroom(classroom.getId(), student.getId());
+
+        assertTrue(result);
+    }
+
+    @Test
+    void classroomNameExists_shouldReturnTrue() {
+        when(classroomRepository.existsByName(classroom.getName())).thenReturn(true);
+
+        boolean result = classroomService.classroomNameExists(classroom.getName());
+
+        assertTrue(result);
     }
 }

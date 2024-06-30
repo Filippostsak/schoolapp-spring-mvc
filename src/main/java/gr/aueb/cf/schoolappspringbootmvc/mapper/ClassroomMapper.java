@@ -87,6 +87,11 @@ public class ClassroomMapper {
      * @return the ClassroomFindMeetingsDTO
      */
     public ClassroomFindMeetingsDTO toClassroomFindMeetingsDTO(Classroom classroom) {
+
+        if (classroom == null) {
+            return null;
+        }
+
         ClassroomFindMeetingsDTO dto = new ClassroomFindMeetingsDTO();
         dto.setId(classroom.getId());
         dto.setName(classroom.getName());
